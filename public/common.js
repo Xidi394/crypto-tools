@@ -39,7 +39,12 @@ const translations = {
         price_label: "Price", ahr_label: "Ahr999", mayer_label: "Mayer", calc_title: "Calculator", base_amt: "Base", invest_freq: "Freq", invest_today: "Buy Now",
         bt_title: "DCA Calculator", bt_desc: "Calculate crypto returns", bt_settings: "Settings", bt_coin: "Symbol", bt_amount: "Amount", bt_start: "Start", bt_end: "End", bt_freq: "Freq",
         bt_btn_reset: "Reset", bt_btn_calc: "Calculate", bt_res_title: "Result", bt_total_coins: "Coins", bt_est_profit: "Profit", bt_invested: "Invested", bt_curr_val: "Value", bt_avg_price: "Avg Price", bt_count: "Count", bt_table_title: "Records", bt_download: "CSV",
-        chart_qty: "Accumulated Coins", chart_avg: "Avg DCA Price", chart_mkt: "Market Price",
+        
+        // 修复：图表文字
+        chart_single: "Single Buy Quantity", // 单次买入数量
+        chart_avg: "Avg DCA Price",
+        chart_mkt: "Market Price",
+        
         th_date: "Date", th_invest: "Invest", th_price: "Price", th_coins: "Coins", th_total_inv: "Total Inv", th_total_coins: "Total Coins", th_avg: "Avg Price"
     },
     "zh": {
@@ -47,7 +52,12 @@ const translations = {
         price_label: "比特币现价", ahr_label: "Ahr999 指数", mayer_label: "Mayer 倍数", calc_title: "智能定投计算器", base_amt: "基础金额", invest_freq: "建议频率", invest_today: "本期应买入",
         bt_title: "加密货币定投收益计算器", bt_desc: "基于真实历史数据回测", bt_settings: "回测参数设置", bt_coin: "定投币种", bt_amount: "定投金额", bt_start: "开始时间", bt_end: "结束时间", bt_freq: "定投频率",
         bt_btn_reset: "一键重置", bt_btn_calc: "立即回测结果", bt_res_title: "回测结果分析", bt_total_coins: "累计持仓", bt_est_profit: "预估收益", bt_invested: "投入本金", bt_curr_val: "当前价值", bt_avg_price: "持仓均价", bt_count: "定投次数", bt_table_title: "详细定投记录", bt_download: "下载记录 (.csv)",
-        chart_qty: "累计持仓数量", chart_avg: "定投持仓均价", chart_mkt: "市场价格",
+        
+        // 修复：图表文字
+        chart_single: "单次买入数量", 
+        chart_avg: "定投持仓均价", 
+        chart_mkt: "市场价格",
+        
         th_date: "日期", th_invest: "本期投入", th_price: "成交价", th_coins: "获得数量", th_total_inv: "累计投入", th_total_coins: "累计持仓", th_avg: "持仓均价"
     },
     "ja": {
@@ -55,7 +65,12 @@ const translations = {
         price_label: "価格", ahr_label: "Ahr999", mayer_label: "Mayer", calc_title: "計算機", base_amt: "基本額", invest_freq: "頻度", invest_today: "投資額",
         bt_title: "積立投資計算機", bt_desc: "収益シミュレーション", bt_settings: "パラメータ", bt_coin: "通貨", bt_amount: "投資額", bt_start: "開始日", bt_end: "終了日", bt_freq: "頻度",
         bt_btn_reset: "リセット", bt_btn_calc: "計算開始", bt_res_title: "分析結果", bt_total_coins: "保有数", bt_est_profit: "予想収益", bt_invested: "投資総額", bt_curr_val: "現在価値", bt_avg_price: "平均単価", bt_count: "回数", bt_table_title: "詳細", bt_download: "CSV",
-        chart_qty: "積立数量", chart_avg: "平均取得単価", chart_mkt: "市場価格",
+        
+        // Chart
+        chart_single: "今回購入数", 
+        chart_avg: "平均取得単価", 
+        chart_mkt: "市場価格",
+        
         th_date: "日付", th_invest: "投資額", th_price: "価格", th_coins: "数量", th_total_inv: "累計投資", th_total_coins: "累計数量", th_avg: "平均単価"
     },
     "ko": {
@@ -63,7 +78,12 @@ const translations = {
         price_label: "가격", ahr_label: "Ahr999", mayer_label: "Mayer", calc_title: "계산기", base_amt: "기본금액", invest_freq: "주기", invest_today: "투자금",
         bt_title: "적립식 투자 계산기", bt_desc: "수익률 계산", bt_settings: "설정", bt_coin: "코인", bt_amount: "투자금", bt_start: "시작일", bt_end: "종료일", bt_freq: "주기",
         bt_btn_reset: "초기화", bt_btn_calc: "계산하기", bt_res_title: "분석 결과", bt_total_coins: "보유수량", bt_est_profit: "예상수익", bt_invested: "총투자금", bt_curr_val: "현재가치", bt_avg_price: "평단가", bt_count: "횟수", bt_table_title: "상세 기록", bt_download: "CSV",
-        chart_qty: "적립 수량", chart_avg: "평단가", chart_mkt: "시장 가격",
+        
+        // Chart
+        chart_single: "1회 구매량", 
+        chart_avg: "평단가", 
+        chart_mkt: "시장 가격",
+        
         th_date: "날짜", th_invest: "투자금", th_price: "가격", th_coins: "수량", th_total_inv: "누적투자", th_total_coins: "누적수량", th_avg: "평단가"
     }
 };
