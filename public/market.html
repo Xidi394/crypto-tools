@@ -19,8 +19,8 @@
 <body>
     <div class="container">
         <div class="card">
-            <h2>📊 Market Overview</h2>
-            <p style="opacity:0.7; font-size:14px;">Top Currencies & Exchange Data (Integration Pending)</p>
+            <h2 data-i18n="market_overview">📊 Market Overview</h2>
+            <p style="opacity:0.7; font-size:14px;" data-i18n="market_desc">Top Currencies & Exchange Data</p>
             
             <div id="market-grid" class="market-grid">
                 <div class="coin-card">
@@ -39,18 +39,17 @@
         </div>
         
         <div class="card">
-            <h3>Exchange Status</h3>
+            <h3 data-i18n="exchange_title">Exchange Status</h3>
             <ul style="font-size:14px; opacity:0.8;">
-                <li>🟢 Binance: Operational</li>
-                <li>🟢 OKX: Operational</li>
-                <li>🟡 Coinbase: Maintenance</li>
+                <li data-i18n="ex_binance">🟢 Binance: Operational</li>
+                <li data-i18n="ex_okx">🟢 OKX: Operational</li>
+                <li data-i18n="ex_coinbase">🟡 Coinbase: Maintenance</li>
             </ul>
         </div>
     </div>
 
     <script src="common.js"></script>
     <script>
-        // 简单的模拟行情获取，未来这里会对接 api/get-market-data
         async function fetchMarket() {
             try {
                 const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd');
