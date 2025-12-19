@@ -6,26 +6,13 @@
     <title>DCA Calculator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <style>
-        /* 兼容 common.js 的夜间模式变量 */
         :root { --bg: #f8f9fa; --card-bg: #ffffff; --text: #1e293b; --accent: #3b82f6; }
         body.dark-mode { --bg: #0f172a; --card-bg: #1e293b; --text: #f1f5f9; --accent: #60a5fa; }
-        
         body { background-color: var(--bg); color: var(--text); transition: 0.3s; margin: 0; }
         .card { background-color: var(--card-bg); transition: 0.3s; }
-        
-        /* 修正 input 在夜间模式的样式 */
-        body.dark-mode input, body.dark-mode select { 
-            background-color: #334155; color: white; border-color: #475569; 
-        }
-
-        /* 加载动画 */
-        .spinner {
-            border: 3px solid rgba(255,255,255,0.3); border-radius: 50%;
-            border-top: 3px solid #fff; width: 20px; height: 20px;
-            animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px;
-        }
+        body.dark-mode input, body.dark-mode select { background-color: #334155; color: white; border-color: #475569; }
+        .spinner { border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 3px solid #fff; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
@@ -49,22 +36,18 @@
                         <label class="text-sm font-medium opacity-70" data-i18n="bt_coin">定投币种</label>
                         <input type="text" id="coinSymbol" value="BTC" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none uppercase transition">
                     </div>
-
                     <div class="flex flex-col space-y-1">
                         <label class="text-sm font-medium opacity-70" data-i18n="bt_amount">定投金额 (USDT)</label>
                         <input type="number" id="investAmount" value="100" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition">
                     </div>
-
                     <div class="flex flex-col space-y-1">
                         <label class="text-sm font-medium opacity-70" data-i18n="bt_start">开始时间</label>
                         <input type="date" id="startDate" min="2009-01-01" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition">
                     </div>
-
                     <div class="flex flex-col space-y-1">
                         <label class="text-sm font-medium opacity-70" data-i18n="bt_end">结束时间</label>
                         <input type="date" id="endDate" min="2009-01-01" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition">
                     </div>
-
                     <div class="flex flex-col space-y-1">
                         <label class="text-sm font-medium opacity-70" data-i18n="bt_freq">定投频率</label>
                         <select id="frequency" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition bg-transparent">
@@ -97,54 +80,67 @@
                             <div class="text-xl md:text-3xl font-bold text-green-600" id="totalProfit">0.00</div>
                         </div>
                     </div>
-
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-4">
-                        <div>
-                            <div class="text-xs opacity-60 mb-1" data-i18n="bt_count">定投次数</div>
-                            <div class="font-bold" id="totalCount">0</div>
-                        </div>
-                        <div>
-                            <div class="text-xs opacity-60 mb-1" data-i18n="bt_invested">投入本金</div>
-                            <div class="font-bold" id="totalInvested">0</div>
-                        </div>
-                        <div>
-                            <div class="text-xs opacity-60 mb-1" data-i18n="bt_curr_val">当前价值</div>
-                            <div class="font-bold" id="currentValue">0.00</div>
-                        </div>
-                        <div>
-                            <div class="text-xs opacity-60 mb-1" data-i18n="bt_avg_price">持仓均价</div>
-                            <div class="font-bold" id="avgPrice">0.00</div>
-                        </div>
+                        <div><div class="text-xs opacity-60 mb-1" data-i18n="bt_count">定投次数</div><div class="font-bold" id="totalCount">0</div></div>
+                        <div><div class="text-xs opacity-60 mb-1" data-i18n="bt_invested">投入本金</div><div class="font-bold" id="totalInvested">0</div></div>
+                        <div><div class="text-xs opacity-60 mb-1" data-i18n="bt_curr_val">当前价值</div><div class="font-bold" id="currentValue">0.00</div></div>
+                        <div><div class="text-xs opacity-60 mb-1" data-i18n="bt_avg_price">持仓均价</div><div class="font-bold" id="avgPrice">0.00</div></div>
                     </div>
                 </div>
 
-                <div class="h-72 w-full">
+                <div class="h-80 w-full">
                     <canvas id="dcaChart"></canvas>
                 </div>
+            </section>
+
+            <section id="tableSection" class="hidden card rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div class="p-4 border-b flex justify-between items-center bg-gray-50 dark:bg-slate-800 dark:border-gray-700">
+                    <h3 class="font-bold text-sm md:text-base" data-i18n="bt_table_title">详细定投记录</h3>
+                    <button onclick="downloadCSV()" class="text-xs md:text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1 cursor-pointer transition">
+                        📥 <span data-i18n="bt_download">下载记录</span>
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-xs md:text-sm text-left">
+                        <thead class="bg-gray-50 dark:bg-slate-700 font-medium">
+                            <tr>
+                                <th class="px-4 py-3 whitespace-nowrap" data-i18n="th_date">日期</th>
+                                <th class="px-4 py-3 whitespace-nowrap" data-i18n="th_invest">本期投入</th>
+                                <th class="px-4 py-3 whitespace-nowrap" data-i18n="th_price">成交价</th>
+                                <th class="px-4 py-3 whitespace-nowrap" data-i18n="th_coins">获得数量</th>
+                                <th class="px-4 py-3 whitespace-nowrap" data-i18n="th_total_inv">累计投入</th>
+                                <th class="px-4 py-3 whitespace-nowrap" data-i18n="th_total_coins">累计持仓</th>
+                                <th class="px-4 py-3 whitespace-nowrap" data-i18n="th_avg">持仓均价</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordTableBody" class="divide-y divide-gray-100 dark:divide-gray-700"></tbody>
+                    </table>
+                </div>
+                <div id="paginationContainer" class="p-4 flex justify-end space-x-2 bg-gray-50 dark:bg-slate-800 border-t border-gray-100 dark:border-gray-700"></div>
             </section>
         </main>
     </div>
 
     <script src="common.js"></script>
     <script>
-        // 1. 初始化默认日期 (页面加载时自动填入)
+        let currentRecords = [];
+        let myChart = null;
+        let currentPage = 1;
+        const itemsPerPage = 10;
+
         window.pageInit = function() {
             const today = new Date().toISOString().split('T')[0];
             const lastYear = new Date(new Date().setFullYear(new Date().getFullYear() - 1)).toISOString().split('T')[0];
-            
             document.getElementById('endDate').value = today;
             document.getElementById('startDate').value = lastYear;
         };
 
-        // 2. 状态同步：当用户在侧边栏切换货币时，刷新结果
         window.refreshData = function() {
-            // 如果结果区是可见的，说明用户已经计算过了，我们重新计算一次来刷新汇率
             if(!document.getElementById('resultSection').classList.contains('hidden')) {
-                calculateDCA();
+                // 如果已经有数据，切换语言时需要重新渲染图表和表格以更新文字
+                renderResults(); 
             }
         };
-
-        let myChart = null;
 
         async function calculateDCA() {
             const btn = document.getElementById('calcBtn');
@@ -153,79 +149,58 @@
             btn.disabled = true;
 
             try {
-                // 获取输入
                 const coinSymbol = document.getElementById('coinSymbol').value.toUpperCase();
                 const amount = parseFloat(document.getElementById('investAmount').value);
                 const freq = parseInt(document.getElementById('frequency').value);
                 const startStr = document.getElementById('startDate').value;
                 const endStr = document.getElementById('endDate').value;
 
-                // API 请求 (CryptoCompare)
                 const startTs = Math.floor(new Date(startStr).getTime() / 1000);
                 const endTs = Math.floor(new Date(endStr).getTime() / 1000);
                 
-                // 限制获取2000天数据，避免太慢
                 const url = `https://min-api.cryptocompare.com/data/v2/histoday?fsym=${coinSymbol}&tsym=USDT&limit=2000&toTs=${endTs}`;
                 const res = await fetch(url);
                 const json = await res.json();
-
                 if (json.Response === 'Error') throw new Error(json.Message);
 
-                const prices = json.Data.Data; // [{time, close}, ...]
-                
-                // 核心定投算法
+                const prices = json.Data.Data;
+                const relevantData = prices.filter(p => p.time >= startTs);
+                if (relevantData.length === 0) throw new Error("所选时间段无数据");
+
+                // 计算逻辑
+                currentRecords = [];
                 let totalInvestedUSD = 0;
                 let totalCoins = 0;
                 let nextBuyTs = startTs;
-                
-                let chartLabels = [];
-                let chartPortfolioValue = [];
-
-                // 过滤有效时间段
-                const relevantData = prices.filter(p => p.time >= startTs);
-
-                if (relevantData.length === 0) throw new Error("所选时间段无数据");
 
                 for (let day of relevantData) {
                     if (day.time >= nextBuyTs) {
-                        // 买入
                         if(day.close > 0) {
-                            totalCoins += amount / day.close;
+                            const coins = amount / day.close;
+                            totalCoins += coins;
                             totalInvestedUSD += amount;
+                            
+                            // 记录每一笔（用于表格）
+                            currentRecords.push({
+                                date: new Date(day.time * 1000).toLocaleDateString(),
+                                invest: amount,
+                                price: day.close,
+                                coins: coins,
+                                totalInv: totalInvestedUSD,
+                                totalCoins: totalCoins,
+                                avgPrice: totalInvestedUSD / totalCoins,
+                                // 图表数据
+                                ts: day.time
+                            });
                         }
                         nextBuyTs += freq * 86400;
                     }
-                    // 记录每天的资产价值用于画图
-                    chartLabels.push(new Date(day.time * 1000).toLocaleDateString());
-                    chartPortfolioValue.push(totalCoins * day.close);
+                    // 补充每日市场价格用于画图（即使没买入的那天）
+                    // 简化处理：这里我们只在记录里存了买入点，画图也画买入点
                 }
 
-                // 计算最终结果
-                const currentPrice = relevantData[relevantData.length - 1].close;
-                const finalValueUSD = totalCoins * currentPrice;
-                const profitUSD = finalValueUSD - totalInvestedUSD;
-
-                // 3. 显示结果 (使用 formatMoney 自动转汇率)
-                document.getElementById('totalCoins').innerText = totalCoins.toFixed(4) + " " + coinSymbol;
-                document.getElementById('totalCount').innerText = Math.floor(totalInvestedUSD / amount);
-                
-                // 这里的关键：所有金额都用 formatMoney 包裹，自动根据 common.js 的设置显示 ¥ 或 $
-                document.getElementById('totalInvested').innerText = formatMoney(totalInvestedUSD);
-                document.getElementById('currentValue').innerText = formatMoney(finalValueUSD);
-                document.getElementById('totalProfit').innerText = formatMoney(profitUSD);
-                
-                // 颜色
-                document.getElementById('totalProfit').className = profitUSD >= 0 
-                    ? "text-xl md:text-3xl font-bold text-green-600" 
-                    : "text-xl md:text-3xl font-bold text-red-600";
-
-                document.getElementById('avgPrice').innerText = formatMoney(totalInvestedUSD / totalCoins);
-
-                // 显示区域
-                document.getElementById('resultSection').classList.remove('hidden');
-
-                // 画图
-                renderChart(chartLabels, chartPortfolioValue);
+                // 渲染所有结果
+                renderResults();
 
             } catch (err) {
                 alert("Error: " + err.message);
@@ -235,41 +210,165 @@
             }
         }
 
-        function renderChart(labels, data) {
+        function renderResults() {
+            if(currentRecords.length === 0) return;
+            
+            const last = currentRecords[currentRecords.length-1];
+            const coinSymbol = document.getElementById('coinSymbol').value.toUpperCase();
+            const currentPrice = last.price; // 近似取最后一次定投时的价格
+            const finalValueUSD = last.totalCoins * currentPrice;
+            const profitUSD = finalValueUSD - last.totalInv;
+
+            // 1. 顶部数据卡片
+            document.getElementById('totalCoins').innerText = last.totalCoins.toFixed(4) + " " + coinSymbol;
+            document.getElementById('totalCount').innerText = currentRecords.length;
+            document.getElementById('totalInvested').innerText = formatMoney(last.totalInv);
+            document.getElementById('currentValue').innerText = formatMoney(finalValueUSD);
+            document.getElementById('totalProfit').innerText = formatMoney(profitUSD);
+            document.getElementById('totalProfit').className = profitUSD >= 0 ? "text-xl md:text-3xl font-bold text-green-600" : "text-xl md:text-3xl font-bold text-red-600";
+            document.getElementById('avgPrice').innerText = formatMoney(last.avgPrice);
+
+            document.getElementById('resultSection').classList.remove('hidden');
+            document.getElementById('tableSection').classList.remove('hidden');
+
+            // 2. 画图
+            renderChart();
+            
+            // 3. 表格分页
+            currentPage = 1;
+            renderTable();
+        }
+
+        function renderChart() {
             const ctx = document.getElementById('dcaChart').getContext('2d');
             if (myChart) myChart.destroy();
+
+            const labels = currentRecords.map(r => r.date);
+            // 市场价格 (用红色虚线)
+            const marketPrices = currentRecords.map(r => r.price);
+            // 定投均价 (用蓝色线)
+            const avgPrices = currentRecords.map(r => r.avgPrice);
+            // 定投数量 (用柱状图，在左轴)
+            const quantities = currentRecords.map(r => r.coins);
 
             myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
-                    datasets: [{
-                        label: 'Portfolio Value (资产价值)',
-                        data: data,
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 0
-                    }]
+                    datasets: [
+                        {
+                            label: getTrans('bt_chart_qty'), // 定投数量
+                            data: quantities,
+                            type: 'bar',
+                            backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                            yAxisID: 'y1', // 左轴
+                            order: 2
+                        },
+                        {
+                            label: getTrans('bt_chart_avg'), // 均价
+                            data: avgPrices,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            yAxisID: 'y', // 右轴
+                            order: 1
+                        },
+                        {
+                            label: getTrans('bt_chart_mkt'), // 市场价
+                            data: marketPrices,
+                            borderColor: '#f59e0b',
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            tension: 0.4,
+                            yAxisID: 'y', // 右轴
+                            order: 0
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     interaction: { intersect: false, mode: 'index' },
-                    plugins: { legend: { display: false } },
+                    plugins: { legend: { position: 'top' } },
                     scales: {
                         x: { display: false },
-                        y: { grid: { color: '#f1f5f9' } }
+                        y: { 
+                            [cite_start]position: 'right', // 价格在右边 [cite: 212]
+                            grid: { color: document.body.classList.contains('dark-mode') ? '#334155' : '#f1f5f9' }
+                        },
+                        y1: {
+                            [cite_start]position: 'left', // 数量在左边 [cite: 214]
+                            grid: { display: false },
+                            display: true
+                        }
                     }
                 }
             });
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('recordTableBody');
+            tbody.innerHTML = '';
+            
+            // 倒序显示，最新的在前面
+            const reversed = [...currentRecords].reverse();
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageData = reversed.slice(start, end);
+
+            pageData.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50 dark:hover:bg-slate-700 transition";
+                tr.innerHTML = `
+                    <td class="px-4 py-3">${r.date}</td>
+                    <td class="px-4 py-3">${formatMoney(r.invest)}</td>
+                    <td class="px-4 py-3">${formatMoney(r.price)}</td>
+                    <td class="px-4 py-3">${r.coins.toFixed(6)}</td>
+                    <td class="px-4 py-3">${formatMoney(r.totalInv)}</td>
+                    <td class="px-4 py-3">${r.totalCoins.toFixed(4)}</td>
+                    <td class="px-4 py-3 text-blue-600 font-medium">${formatMoney(r.avgPrice)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // 简单分页逻辑
+            const totalPages = Math.ceil(reversed.length / itemsPerPage);
+            const container = document.getElementById('paginationContainer');
+            container.innerHTML = `
+                <button ${currentPage===1?'disabled':''} onclick="currentPage--;renderTable()" class="px-3 py-1 bg-white dark:bg-slate-700 border rounded disabled:opacity-50"><</button>
+                <span class="px-3 py-1 text-sm">Page ${currentPage} / ${totalPages}</span>
+                <button ${currentPage===totalPages?'disabled':''} onclick="currentPage++;renderTable()" class="px-3 py-1 bg-white dark:bg-slate-700 border rounded disabled:opacity-50">></button>
+            `;
+        }
+
+        function downloadCSV() {
+            if (currentRecords.length === 0) return;
+            const coinSymbol = document.getElementById('coinSymbol').value.toUpperCase();
+            
+            // CSV头
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += `Date,Invested(USD),Price(USD),Coins,Total Invested(USD),Total Coins,Avg Price(USD)\n`;
+            
+            currentRecords.forEach(r => {
+                csvContent += `${r.date},${r.invest},${r.price},${r.coins},${r.totalInv},${r.totalCoins},${r.avgPrice}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `DCA_${coinSymbol}_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         function resetForm() {
             document.getElementById('coinSymbol').value = "BTC";
             document.getElementById('investAmount').value = "100";
             document.getElementById('resultSection').classList.add('hidden');
+            document.getElementById('tableSection').classList.add('hidden');
         }
     </script>
 </body>
