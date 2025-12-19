@@ -3,55 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>加密货币私人助手</title>
+    <title>加密货币私人助手 Pro</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; transition: 0.3s; }
-        .card { border: 1px solid #ddd; padding: 20px; border-radius: 10px; margin-top: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        h1 { color: #333; }
-        .price-tag { font-size: 24px; font-weight: bold; color: #d9534f; }
-        button { padding: 10px 20px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 5px; }
+        :root { --bg: #f4f4f9; --card-bg: #fff; --text: #333; --accent: #007bff; --red: #d9534f; --green: #28a745; }
+        body.dark-mode { --bg: #1a1a1a; --card-bg: #2d2d2d; --text: #f0f0f0; --accent: #4da3ff; --red: #ff6b6b; --green: #5cdb5c; }
         
-        /* 夜间模式样式 */
-        body.dark-mode { background-color: #1a1a1a; color: #f0f0f0; }
-        body.dark-mode .card { border-color: #444; background-color: #2d2d2d; }
-        body.dark-mode h1 { color: #fff; }
+        body { font-family: 'Segoe UI', sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; background-color: var(--bg); color: var(--text); transition: 0.3s; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .card { background: var(--card-bg); border-radius: 16px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        h1 { margin: 0; font-size: 24px; }
+        .price-big { font-size: 36px; font-weight: 800; color: var(--text); letter-spacing: -1px; margin: 10px 0; }
+        .label { font-size: 14px; opacity: 0.7; margin-bottom: 4px; display: block; }
+        
+        /* 仪表盘样式 */
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .stat-box { background: rgba(0,0,0,0.03); padding: 15px; border-radius: 12px; text-align: center; }
+        .stat-value { font-size: 20px; font-weight: bold; display: block; margin-top: 5px; }
+        .ahr-value { color: var(--accent); }
+        
+        /* 定投计算器样式 */
+        .invest-card { border: 2px solid var(--accent); position: relative; overflow: hidden; }
+        .invest-badge { position: absolute; top: 0; right: 0; background: var(--accent); color: white; padding: 5px 15px; font-size: 12px; border-bottom-left-radius: 12px; }
+        
+        .input-group { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; background: rgba(0,0,0,0.03); padding: 10px; border-radius: 8px; }
+        input[type="number"] { background: transparent; border: none; font-size: 18px; width: 80px; color: var(--text); border-bottom: 2px solid var(--accent); text-align: center; outline: none; }
+        
+        .result-box { display: flex; justify-content: space-between; align-items: flex-end; }
+        .buy-action { text-align: right; }
+        .buy-amount { font-size: 32px; font-weight: bold; color: var(--red); display: block; }
+        .buy-desc { font-size: 14px; opacity: 0.8; }
+        
+        .btn { padding: 8px 16px; cursor: pointer; background: var(--accent); color: white; border: none; border-radius: 8px; font-weight: 500; }
+        .refresh-btn { background: transparent; color: var(--text); border: 1px solid rgba(0,0,0,0.1); }
+        
+        /* 状态颜色类 */
+        .status-red { color: var(--red); }
+        .status-green { color: var(--green); }
     </style>
 </head>
 <body>
 
-    <h1>🚀 Crypto Tools</h1>
-    <button onclick="toggleTheme()">切换夜间模式</button>
+    <div class="header">
+        <h1>🦄 Crypto Pro</h1>
+        <button class="btn" onclick="toggleTheme()">🌗</button>
+    </div>
 
     <div class="card">
-        <h3>BTC 实时数据</h3>
-        <p>当前价格: <span id="price" class="price-tag">加载中...</span> USD</p>
-        <p>Ahr999 (模拟): <span id="index">--</span></p>
-        <p>建议: <strong id="advice">--</strong></p>
-        <p style="font-size: 12px; color: #888;">更新时间: <span id="time">--</span></p>
+        <span class="label">Bitcoin Price</span>
+        <div id="price" class="price-big">Loading...</div>
+        
+        <div class="dashboard-grid">
+            <div class="stat-box">
+                <span class="label">Ahr999 指数</span>
+                <span id="ahr-index" class="stat-value ahr-value">--</span>
+            </div>
+            <div class="stat-box">
+                <span class="label">当前状态</span>
+                <span id="strategy-text" class="stat-value">--</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card invest-card">
+        <div class="invest-badge" id="freq-badge">智能推荐</div>
+        
+        <h3>💰 智能定投计算器</h3>
+        <p class="label">根据 Ahr999 自动计算买入金额</p>
+        
+        <div class="input-group">
+            <span>基础单份金额 (1份):</span>
+            <span style="color:var(--text);">$</span>
+            <input type="number" id="base-amount" value="25" oninput="calculateInvest()">
+        </div>
+
+        <div class="result-box">
+            <div>
+                <span class="label">推荐倍数</span>
+                <span id="multiplier-display" style="font-size: 24px; font-weight: bold;">x 0</span>
+                <span style="font-size:14px">份</span>
+            </div>
+            <div class="buy-action">
+                <span class="label">本期应买入</span>
+                <span id="final-amount" class="buy-amount">$0</span>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <button class="btn refresh-btn" onclick="fetchData()">🔄 刷新数据</button>
+        <p style="font-size: 12px; opacity: 0.5; margin-top: 10px;">数据源: CoinGecko (200日真实均价)</p>
     </div>
 
     <script src="common.js"></script>
-    
     <script>
-        // 页面加载后，立刻去问后端要数据
+        let currentMultiplier = 0;
+
         async function fetchData() {
+            const priceEl = document.getElementById('price');
+            const ahrEl = document.getElementById('ahr-index');
+            
+            priceEl.style.opacity = '0.5'; // 加载中效果
+            
             try {
-                // 呼叫后端 API
                 const res = await fetch('/api/get-ahr999');
                 const data = await res.json();
                 
-                // 把数据显示在屏幕上
-                document.getElementById('price').innerText = data.price;
-                document.getElementById('index').innerText = data.index;
-                document.getElementById('advice').innerText = data.advice;
-                document.getElementById('time').innerText = data.updateTime;
+                if(data.error) {
+                    priceEl.innerText = "数据源维护中";
+                    return;
+                }
+
+                // 1. 更新基础数据
+                priceEl.innerText = '$' + data.price.toLocaleString();
+                ahrEl.innerText = data.ahr999;
+                document.getElementById('strategy-text').innerText = data.strategy;
+                document.getElementById('freq-badge').innerText = "建议: " + data.frequency;
+                
+                // 2. 颜色逻辑
+                if (data.ahr999 < 0.45) {
+                    ahrEl.style.color = 'var(--green)'; // 抄底绿色
+                    document.getElementById('strategy-text').className = 'stat-value status-green';
+                } else if (data.ahr999 > 1.2) {
+                    ahrEl.style.color = 'var(--red)'; // 逃顶红色
+                    document.getElementById('strategy-text').className = 'stat-value status-red';
+                } else {
+                    ahrEl.style.color = 'var(--accent)';
+                    document.getElementById('strategy-text').className = 'stat-value';
+                }
+
+                // 3. 存储倍数并触发计算
+                currentMultiplier = data.multiplier;
+                document.getElementById('multiplier-display').innerText = "x " + currentMultiplier;
+                calculateInvest(); // 重新计算金额
+
             } catch (err) {
-                document.getElementById('price').innerText = "获取失败";
                 console.error(err);
+                priceEl.innerText = "Error";
+            } finally {
+                priceEl.style.opacity = '1';
             }
         }
-        
-        fetchData(); // 执行函数
+
+        // 核心计算逻辑：用户输入变了，或者倍数变了，都重新算
+        function calculateInvest() {
+            const base = document.getElementById('base-amount').value;
+            const total = base * currentMultiplier;
+            
+            // 动画效果显示金额
+            const finalEl = document.getElementById('final-amount');
+            finalEl.innerText = '$' + total.toLocaleString();
+            
+            if (currentMultiplier === 0) {
+                finalEl.style.color = '#999';
+                finalEl.innerText = "暂不操作";
+            } else {
+                finalEl.style.color = 'var(--red)';
+            }
+        }
+
+        fetchData();
     </script>
 </body>
 </html>
