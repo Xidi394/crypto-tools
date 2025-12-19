@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Private Ledger</title>
+    <style>
+        :root { --bg: #f8f9fa; --card-bg: #ffffff; --text: #2c3e50; --accent: #3498db; --red: #e74c3c; --green: #2ecc71; }
+        body.dark-mode { --bg: #121212; --card-bg: #1e1e1e; --text: #ecf0f1; --accent: #5dade2; }
+        body { font-family: -apple-system, sans-serif; margin: 0; background-color: var(--bg); color: var(--text); transition: 0.3s; }
+        .container { max-width: 640px; margin: 0 auto; padding: 20px; }
+        .card { background: var(--card-bg); border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); }
+        .btn { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; }
+        input { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; background: var(--bg); color: var(--text); }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { text-align: left; padding: 12px 5px; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 14px; }
+        .total-asset { font-size: 32px; font-weight: 800; text-align: center; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div style="text-align: center; opacity: 0.7; font-size: 12px;">Total Net Worth (Est.)</div>
+            <div class="total-asset" id="total-val">--</div>
+            <div style="text-align: center; font-size: 12px; color: var(--accent);">🔒 Data stored locally on device</div>
+        </div>
+
+        <div class="card">
+            <h3>My Assets</h3>
+            <table id="asset-table">
+                <thead>
+                    <tr>
+                        <th>Coin</th>
+                        <th>Amount</th>
+                        <th>Cost($)</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="asset-list"></tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Add Transaction</h3>
+            <input type="text" id="coin-symbol" placeholder="Symbol (e.g. BTC)" style="text-transform: uppercase;">
+            <input type="number" id="coin-amount" placeholder="Amount (e.g. 0.1)">
+            <input type="number" id="coin-cost" placeholder="Avg Cost Price (Optional)">
+            <button class="btn" onclick="addAsset()">Add to Ledger</button>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px;">
+             <button onclick="exportData()" style="background:none; border:1px solid var(--text); padding:5px 15px; border-radius:20px; color:var(--text); cursor:pointer;">📥 Backup Data (.json)</button>
+        </div>
+    </div>
+
+    <script src="common.js"></script>
+    <script>
+        // 简单的本地存储逻辑
+        let assets = JSON.parse(localStorage.getItem('my_assets') || '[]');
+
+        function renderAssets() {
+            const tbody = document.getElementById('asset-list');
+            tbody.innerHTML = '';
+            let totalUSD = 0;
+            
+            // 获取当前汇率 (从 common.js 的全局变量)
+            const btcPrice = exchangeRates['USD'] ? 100000 : 0; // 这里的逻辑后续需要对接实时价格 API
+            
+            assets.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight:bold;">${item.symbol}</td>
+                    <td>${item.amount}</td>
+                    <td>$${item.cost || 0}</td>
+                    <td><button onclick="removeAsset(${index})" style="color:var(--red); border:none; background:none; cursor:pointer;">×</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+            // 暂时只显示占位符，因为还没有对接所有币种的实时价格
+            document.getElementById('total-val').innerText = "Calculate Later"; 
+        }
+
+        function addAsset() {
+            const sym = document.getElementById('coin-symbol').value.toUpperCase();
+            const amt = parseFloat(document.getElementById('coin-amount').value);
+            const cost = parseFloat(document.getElementById('coin-cost').value) || 0;
+            if(sym && amt) {
+                assets.push({ symbol: sym, amount: amt, cost: cost });
+                save();
+                renderAssets();
+                // 清空输入
+                document.getElementById('coin-symbol').value = '';
+                document.getElementById('coin-amount').value = '';
+            }
+        }
+
+        function removeAsset(index) {
+            if(confirm('Delete this record?')) {
+                assets.splice(index, 1);
+                save();
+                renderAssets();
+            }
+        }
+
+        function save() {
+            localStorage.setItem('my_assets', JSON.stringify(assets));
+        }
+
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(assets));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "crypto_edge_backup_" + new Date().toISOString() + ".json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        // 初始化
+        window.pageInit = function() { renderAssets(); };
+    </script>
+</body>
+</html>
