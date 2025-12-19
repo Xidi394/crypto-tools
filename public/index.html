@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>加密货币私人助手</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; transition: 0.3s; }
+        .card { border: 1px solid #ddd; padding: 20px; border-radius: 10px; margin-top: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1 { color: #333; }
+        .price-tag { font-size: 24px; font-weight: bold; color: #d9534f; }
+        button { padding: 10px 20px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 5px; }
+        
+        /* 夜间模式样式 */
+        body.dark-mode { background-color: #1a1a1a; color: #f0f0f0; }
+        body.dark-mode .card { border-color: #444; background-color: #2d2d2d; }
+        body.dark-mode h1 { color: #fff; }
+    </style>
+</head>
+<body>
+
+    <h1>🚀 Crypto Tools</h1>
+    <button onclick="toggleTheme()">切换夜间模式</button>
+
+    <div class="card">
+        <h3>BTC 实时数据</h3>
+        <p>当前价格: <span id="price" class="price-tag">加载中...</span> USD</p>
+        <p>Ahr999 (模拟): <span id="index">--</span></p>
+        <p>建议: <strong id="advice">--</strong></p>
+        <p style="font-size: 12px; color: #888;">更新时间: <span id="time">--</span></p>
+    </div>
+
+    <script src="common.js"></script>
+    
+    <script>
+        // 页面加载后，立刻去问后端要数据
+        async function fetchData() {
+            try {
+                // 呼叫后端 API
+                const res = await fetch('/api/get-ahr999');
+                const data = await res.json();
+                
+                // 把数据显示在屏幕上
+                document.getElementById('price').innerText = data.price;
+                document.getElementById('index').innerText = data.index;
+                document.getElementById('advice').innerText = data.advice;
+                document.getElementById('time').innerText = data.updateTime;
+            } catch (err) {
+                document.getElementById('price').innerText = "获取失败";
+                console.error(err);
+            }
+        }
+        
+        fetchData(); // 执行函数
+    </script>
+</body>
+</html>
