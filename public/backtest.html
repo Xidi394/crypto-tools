@@ -3,161 +3,273 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DCA Backtest - Crypto Tools</title>
+    <title>DCA Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
-        :root { --bg: #f8f9fa; --card-bg: #ffffff; --text: #2c3e50; --accent: #3498db; }
-        body.dark-mode { --bg: #121212; --card-bg: #1e1e1e; --text: #ecf0f1; --accent: #5dade2; }
-        body { font-family: -apple-system, sans-serif; padding: 15px; max-width: 640px; margin: 0 auto; background-color: var(--bg); color: var(--text); transition: 0.3s; }
-        .card { background: var(--card-bg); border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        input, select, button { width: 100%; padding: 12px; margin-top: 5px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ddd; background: var(--bg); color: var(--text); box-sizing: border-box; }
-        button { background: var(--accent); color: white; border: none; font-weight: bold; cursor: pointer; }
-        button:hover { opacity: 0.9; }
-        .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
-        .res-box { background: rgba(0,0,0,0.03); padding: 15px; border-radius: 8px; text-align: center; }
-        .res-val { font-size: 20px; font-weight: bold; margin-top: 5px; display: block; word-break: break-all; }
-        .green { color: #2ecc71; } .red { color: #e74c3c; }
+        /* 兼容 common.js 的夜间模式变量 */
+        :root { --bg: #f8f9fa; --card-bg: #ffffff; --text: #1e293b; --accent: #3b82f6; }
+        body.dark-mode { --bg: #0f172a; --card-bg: #1e293b; --text: #f1f5f9; --accent: #60a5fa; }
+        
+        body { background-color: var(--bg); color: var(--text); transition: 0.3s; margin: 0; }
+        .card { background-color: var(--card-bg); transition: 0.3s; }
+        
+        /* 修正 input 在夜间模式的样式 */
+        body.dark-mode input, body.dark-mode select { 
+            background-color: #334155; color: white; border-color: #475569; 
+        }
+
+        /* 加载动画 */
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.3); border-radius: 50%;
+            border-top: 3px solid #fff; width: 20px; height: 20px;
+            animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body>
+<body class="p-0">
 
-    <div class="card">
-        <h2 style="margin-top:0;">📉 定投回测 (DCA)</h2>
-        <p style="font-size:12px; opacity:0.7;">数据源: CryptoCompare</p>
+    <div class="max-w-7xl mx-auto space-y-6 md:space-y-8 p-4 md:p-8">
+        
+        <header class="text-center mb-4 md:mb-8">
+            <h1 class="text-2xl md:text-4xl font-extrabold tracking-tight" data-i18n="bt_title">加密货币定投收益计算器</h1>
+            <p class="text-gray-500 mt-2 text-xs md:text-base" data-i18n="bt_desc">基于真实历史数据回测...</p>
+        </header>
 
-        <label>币种 (Symbol)</label>
-        <input type="text" id="coinSymbol" value="BTC" placeholder="BTC, ETH, SOL...">
+        <main class="space-y-6">
+            <section class="card p-5 md:p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-lg md:text-xl font-bold" data-i18n="bt_settings">回测参数设置</h2>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 mb-6">
+                    <div class="flex flex-col space-y-1">
+                        <label class="text-sm font-medium opacity-70" data-i18n="bt_coin">定投币种</label>
+                        <input type="text" id="coinSymbol" value="BTC" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none uppercase transition">
+                    </div>
 
-        <label>每次定投金额 (USDT)</label>
-        <input type="number" id="investAmount" value="100">
+                    <div class="flex flex-col space-y-1">
+                        <label class="text-sm font-medium opacity-70" data-i18n="bt_amount">定投金额 (USDT)</label>
+                        <input type="number" id="investAmount" value="100" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition">
+                    </div>
 
-        <label>开始日期</label>
-        <input type="date" id="startDate" value="2024-01-01">
+                    <div class="flex flex-col space-y-1">
+                        <label class="text-sm font-medium opacity-70" data-i18n="bt_start">开始时间</label>
+                        <input type="date" id="startDate" min="2009-01-01" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition">
+                    </div>
 
-        <label>定投频率</label>
-        <select id="frequency">
-            <option value="1">每天 (Daily)</option>
-            <option value="7" selected>每周 (Weekly)</option>
-            <option value="30">每月 (Monthly)</option>
-        </select>
+                    <div class="flex flex-col space-y-1">
+                        <label class="text-sm font-medium opacity-70" data-i18n="bt_end">结束时间</label>
+                        <input type="date" id="endDate" min="2009-01-01" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition">
+                    </div>
 
-        <button onclick="calculateDCA()" id="calcBtn">开始回测</button>
-    </div>
+                    <div class="flex flex-col space-y-1">
+                        <label class="text-sm font-medium opacity-70" data-i18n="bt_freq">定投频率</label>
+                        <select id="frequency" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition bg-transparent">
+                            <option value="1">每天 (Daily)</option>
+                            <option value="7" selected>每7天 (Weekly)</option>
+                            <option value="30">每30天 (Monthly)</option>
+                        </select>
+                    </div>
+                </div>
 
-    <div id="resultSection" class="card" style="display:none;">
-        <h3 style="margin-top:0;">回测结果</h3>
-        <div class="result-grid">
-            <div class="res-box">
-                <span style="font-size:12px;">总投入本金</span>
-                <span id="totalInvested" class="res-val">--</span>
-            </div>
-            <div class="res-box">
-                <span style="font-size:12px;">当前资产价值</span>
-                <span id="currentValue" class="res-val">--</span>
-            </div>
-            <div class="res-box">
-                <span style="font-size:12px;">持仓数量</span>
-                <span id="totalCoins" class="res-val">--</span>
-            </div>
-            <div class="res-box">
-                <span style="font-size:12px;">收益率 (ROI)</span>
-                <span id="roi" class="res-val">--</span>
-            </div>
-        </div>
+                <div class="flex justify-center space-x-4 border-t border-gray-100 pt-6 dark:border-gray-700">
+                    <button onclick="resetForm()" class="px-6 py-2.5 border border-blue-500 text-blue-600 rounded-lg hover:bg-blue-50 transition font-medium" data-i18n="bt_btn_reset">一键重置</button>
+                    <button id="calcBtn" onclick="calculateDCA()" class="px-8 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-lg font-medium" data-i18n="bt_btn_calc">
+                        立即回测结果
+                    </button>
+                </div>
+            </section>
+
+            <section id="resultSection" class="hidden card p-5 md:p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-bold mb-6" data-i18n="bt_res_title">回测结果分析</h3>
+                
+                <div class="bg-slate-50 dark:bg-slate-800 p-4 md:p-6 rounded-xl mb-8 border border-slate-100 dark:border-slate-700">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4 border-b border-slate-200 dark:border-slate-600 mb-4">
+                        <div>
+                            <div class="text-xs opacity-60 mb-1" data-i18n="bt_total_coins">累计持仓</div>
+                            <div class="text-xl md:text-3xl font-bold text-blue-600" id="totalCoins">0.00</div>
+                        </div>
+                        <div>
+                            <div class="text-xs opacity-60 mb-1" data-i18n="bt_est_profit">预估收益</div>
+                            <div class="text-xl md:text-3xl font-bold text-green-600" id="totalProfit">0.00</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-4">
+                        <div>
+                            <div class="text-xs opacity-60 mb-1" data-i18n="bt_count">定投次数</div>
+                            <div class="font-bold" id="totalCount">0</div>
+                        </div>
+                        <div>
+                            <div class="text-xs opacity-60 mb-1" data-i18n="bt_invested">投入本金</div>
+                            <div class="font-bold" id="totalInvested">0</div>
+                        </div>
+                        <div>
+                            <div class="text-xs opacity-60 mb-1" data-i18n="bt_curr_val">当前价值</div>
+                            <div class="font-bold" id="currentValue">0.00</div>
+                        </div>
+                        <div>
+                            <div class="text-xs opacity-60 mb-1" data-i18n="bt_avg_price">持仓均价</div>
+                            <div class="font-bold" id="avgPrice">0.00</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="h-72 w-full">
+                    <canvas id="dcaChart"></canvas>
+                </div>
+            </section>
+        </main>
     </div>
 
     <script src="common.js"></script>
     <script>
-        // 页面初始化时，common.js 会调用这个
+        // 1. 初始化默认日期 (页面加载时自动填入)
         window.pageInit = function() {
-            // 设置默认开始日期为一年前
-            const today = new Date();
-            const lastYear = new Date(today.setFullYear(today.getFullYear() - 1));
-            document.getElementById('startDate').value = lastYear.toISOString().split('T')[0];
+            const today = new Date().toISOString().split('T')[0];
+            const lastYear = new Date(new Date().setFullYear(new Date().getFullYear() - 1)).toISOString().split('T')[0];
+            
+            document.getElementById('endDate').value = today;
+            document.getElementById('startDate').value = lastYear;
         };
 
-        // 当用户切换货币时，重新计算结果
+        // 2. 状态同步：当用户在侧边栏切换货币时，刷新结果
         window.refreshData = function() {
-            const resultDisplay = document.getElementById('resultSection').style.display;
-            if (resultDisplay !== 'none') {
-                calculateDCA(); // 如果已经有结果，重新计算以刷新货币符号
+            // 如果结果区是可见的，说明用户已经计算过了，我们重新计算一次来刷新汇率
+            if(!document.getElementById('resultSection').classList.contains('hidden')) {
+                calculateDCA();
             }
         };
 
+        let myChart = null;
+
         async function calculateDCA() {
             const btn = document.getElementById('calcBtn');
-            const originalText = btn.innerText;
-            btn.innerText = "计算中...";
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner"></span> Computing...';
             btn.disabled = true;
 
             try {
-                // 1. 获取用户输入
-                const symbol = document.getElementById('coinSymbol').value.toUpperCase();
+                // 获取输入
+                const coinSymbol = document.getElementById('coinSymbol').value.toUpperCase();
                 const amount = parseFloat(document.getElementById('investAmount').value);
                 const freq = parseInt(document.getElementById('frequency').value);
-                const startDateStr = document.getElementById('startDate').value;
-                
-                // 2. 转换时间戳
-                const startTs = Math.floor(new Date(startDateStr).getTime() / 1000);
-                const endTs = Math.floor(new Date().getTime() / 1000); // 截止到今天
+                const startStr = document.getElementById('startDate').value;
+                const endStr = document.getElementById('endDate').value;
 
-                // 3. 获取历史数据 (使用 CryptoCompare)
-                // 注意：这里为了演示，简单获取最近 2000 天的数据
-                const url = `https://min-api.cryptocompare.com/data/v2/histoday?fsym=${symbol}&tsym=USDT&limit=2000`;
+                // API 请求 (CryptoCompare)
+                const startTs = Math.floor(new Date(startStr).getTime() / 1000);
+                const endTs = Math.floor(new Date(endStr).getTime() / 1000);
+                
+                // 限制获取2000天数据，避免太慢
+                const url = `https://min-api.cryptocompare.com/data/v2/histoday?fsym=${coinSymbol}&tsym=USDT&limit=2000&toTs=${endTs}`;
                 const res = await fetch(url);
                 const json = await res.json();
 
                 if (json.Response === 'Error') throw new Error(json.Message);
 
-                const prices = json.Data.Data; // [{time:..., close:...}]
+                const prices = json.Data.Data; // [{time, close}, ...]
                 
-                // 4. 开始定投逻辑
-                let totalCoins = 0;
+                // 核心定投算法
                 let totalInvestedUSD = 0;
+                let totalCoins = 0;
                 let nextBuyTs = startTs;
+                
+                let chartLabels = [];
+                let chartPortfolioValue = [];
 
-                // 过滤出开始日期之后的数据
+                // 过滤有效时间段
                 const relevantData = prices.filter(p => p.time >= startTs);
 
-                if (relevantData.length === 0) throw new Error("所选日期太早或无数据");
+                if (relevantData.length === 0) throw new Error("所选时间段无数据");
 
-                // 遍历每一天的数据
-                for (let dayData of relevantData) {
-                    // 如果到了定投日 (简单模拟: 时间戳 >= 下次买入时间)
-                    if (dayData.time >= nextBuyTs) {
-                        const price = dayData.close;
-                        if (price > 0) {
-                            const coins = amount / price;
-                            totalCoins += coins;
+                for (let day of relevantData) {
+                    if (day.time >= nextBuyTs) {
+                        // 买入
+                        if(day.close > 0) {
+                            totalCoins += amount / day.close;
                             totalInvestedUSD += amount;
                         }
-                        // 更新下次买入时间 (+ 7天 或 +1天)
-                        nextBuyTs += freq * 86400; 
+                        nextBuyTs += freq * 86400;
                     }
+                    // 记录每天的资产价值用于画图
+                    chartLabels.push(new Date(day.time * 1000).toLocaleDateString());
+                    chartPortfolioValue.push(totalCoins * day.close);
                 }
 
-                // 5. 计算结果
+                // 计算最终结果
                 const currentPrice = relevantData[relevantData.length - 1].close;
                 const finalValueUSD = totalCoins * currentPrice;
                 const profitUSD = finalValueUSD - totalInvestedUSD;
-                const roi = (profitUSD / totalInvestedUSD) * 100;
 
-                // 6. 显示结果 (使用 common.js 的 formatMoney 自动转汇率)
-                document.getElementById('resultSection').style.display = 'block';
+                // 3. 显示结果 (使用 formatMoney 自动转汇率)
+                document.getElementById('totalCoins').innerText = totalCoins.toFixed(4) + " " + coinSymbol;
+                document.getElementById('totalCount').innerText = Math.floor(totalInvestedUSD / amount);
                 
+                // 这里的关键：所有金额都用 formatMoney 包裹，自动根据 common.js 的设置显示 ¥ 或 $
                 document.getElementById('totalInvested').innerText = formatMoney(totalInvestedUSD);
                 document.getElementById('currentValue').innerText = formatMoney(finalValueUSD);
-                document.getElementById('totalCoins').innerText = totalCoins.toFixed(4) + " " + symbol;
+                document.getElementById('totalProfit').innerText = formatMoney(profitUSD);
                 
-                const roiEl = document.getElementById('roi');
-                roiEl.innerText = roi.toFixed(2) + "%";
-                roiEl.className = roi >= 0 ? "res-val green" : "res-val red";
+                // 颜色
+                document.getElementById('totalProfit').className = profitUSD >= 0 
+                    ? "text-xl md:text-3xl font-bold text-green-600" 
+                    : "text-xl md:text-3xl font-bold text-red-600";
+
+                document.getElementById('avgPrice').innerText = formatMoney(totalInvestedUSD / totalCoins);
+
+                // 显示区域
+                document.getElementById('resultSection').classList.remove('hidden');
+
+                // 画图
+                renderChart(chartLabels, chartPortfolioValue);
 
             } catch (err) {
-                alert("计算失败: " + err.message);
+                alert("Error: " + err.message);
             } finally {
-                btn.innerText = originalText;
+                btn.innerHTML = originalText;
                 btn.disabled = false;
             }
+        }
+
+        function renderChart(labels, data) {
+            const ctx = document.getElementById('dcaChart').getContext('2d');
+            if (myChart) myChart.destroy();
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Portfolio Value (资产价值)',
+                        data: data,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { intersect: false, mode: 'index' },
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: false },
+                        y: { grid: { color: '#f1f5f9' } }
+                    }
+                }
+            });
+        }
+
+        function resetForm() {
+            document.getElementById('coinSymbol').value = "BTC";
+            document.getElementById('investAmount').value = "100";
+            document.getElementById('resultSection').classList.add('hidden');
         }
     </script>
 </body>
