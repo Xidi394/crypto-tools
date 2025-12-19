@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>定投时光机 - Backtest</title>
+    <style>
+        :root { --bg: #f8f9fa; --card-bg: #fff; --text: #333; --accent: #6c5ce7; --green: #00b894; --red: #d63031; }
+        body.dark-mode { --bg: #121212; --card-bg: #1e1e1e; --text: #f0f0f0; --accent: #a29bfe; --green: #55efc4; --red: #ff7675; }
+        
+        body { font-family: sans-serif; padding: 20px; max-width: 640px; margin: 0 auto; background: var(--bg); color: var(--text); transition: 0.3s; }
+        .nav { margin-bottom: 20px; display: flex; gap: 15px; }
+        .nav a { text-decoration: none; color: var(--text); opacity: 0.6; font-weight: bold; }
+        .nav a.active { opacity: 1; color: var(--accent); border-bottom: 2px solid var(--accent); }
+        
+        .card { background: var(--card-bg); padding: 25px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        h2 { margin-top: 0; }
+        
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-size: 14px; opacity: 0.8; }
+        input, select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; background: var(--bg); color: var(--text); font-size: 16px; box-sizing: border-box;}
+        
+        .btn { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn:hover { opacity: 0.9; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+
+        .result-box { display: none; margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 20px; }
+        .big-num { font-size: 32px; font-weight: 800; margin: 10px 0; }
+        .profit-plus { color: var(--green); }
+        .profit-minus { color: var(--red); }
+        
+        .row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <div class="nav">
+        <a href="index.html">🏠 行情看板</a>
+        <a href="backtest.html" class="active">📉 时光机</a>
+        <a href="#" style="cursor:not-allowed; opacity:0.3">📒 记账(开发中)</a>
+    </div>
+
+    <div class="card">
+        <h2>⏳ 如果我以前就开始...</h2>
+        
+        <div class="input-group">
+            <label>定投频率</label>
+            <select id="freq">
+                <option value="daily">每天定投 (Daily)</option>
+                <option value="weekly" selected>每周定投 (Weekly)</option>
+                <option value="monthly">每月定投 (Monthly)</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>每次投入金额 (USDT)</label>
+            <input type="number" id="amount" value="100">
+        </div>
+
+        <div class="input-group">
+            <label>开始时间 (回测范围: 最多365天)</label>
+            <select id="days-ago">
+                <option value="30">最近 1 个月</option>
+                <option value="90">最近 3 个月</option>
+                <option value="180">最近 6 个月</option>
+                <option value="365" selected>最近 1 年</option>
+            </select>
+        </div>
+
+        <button class="btn" onclick="runBacktest()" id="run-btn">开始计算</button>
+
+        <div id="result" class="result-box">
+            <div class="row">
+                <span>总投入本金:</span>
+                <span id="total-invested">--</span>
+            </div>
+            <div class="row">
+                <span>当前资产价值:</span>
+                <span id="current-value" style="font-weight:bold">--</span>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <label>总收益率</label>
+                <div id="roi" class="big-num">0.00%</div>
+                <div id="profit-amt" style="font-size: 14px;">+ $0</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="common.js"></script>
+    <script>
+        async function runBacktest() {
+            const btn = document.getElementById('run-btn');
+            const resultBox = document.getElementById('result');
+            
+            // 1. 获取用户输入
+            const amount = parseFloat(document.getElementById('amount').value);
+            const freq = document.getElementById('freq').value;
+            const days = parseInt(document.getElementById('days-ago').value);
+            
+            // UI 交互
+            btn.innerText = "正在穿越时空...";
+            btn.disabled = true;
+            resultBox.style.display = 'none';
+
+            try {
+                // 2. 借用之前的 API 获取历史数据 (复用 get-ahr999 里的 Coingecko 数据源)
+                // 这里我们直接请求 Coingecko 前端接口，或者也可以写个新 API，但为了省事直接前端请求
+                const res = await fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=${days}&interval=daily`);
+                const data = await res.json();
+                const prices = data.prices; // [[timestamp, price], ...]
+
+                let totalInvested = 0;
+                let totalCoins = 0;
+                let lastInvestTime = 0;
+                
+                // 3. 开始模拟定投
+                // 间隔时间(毫秒): 天=86400000, 周=604800000, 月=2592000000
+                let interval = 86400000; 
+                if(freq === 'weekly') interval = 604800000;
+                if(freq === 'monthly') interval = 2592000000;
+
+                // 遍历每一天的历史价格
+                for (let i = 0; i < prices.length; i++) {
+                    const timestamp = prices[i][0];
+                    const price = prices[i][1];
+
+                    // 如果当前时间 > 上次定投时间 + 间隔，就买入
+                    if (timestamp > lastInvestTime + interval) {
+                        const coinsBought = amount / price; // 买了多少币
+                        totalCoins += coinsBought;
+                        totalInvested += amount;
+                        lastInvestTime = timestamp;
+                    }
+                }
+
+                // 4. 计算最终结果
+                const currentPrice = prices[prices.length - 1][1];
+                const finalValue = totalCoins * currentPrice;
+                const profit = finalValue - totalInvested;
+                const roi = (profit / totalInvested) * 100;
+
+                // 5. 显示结果
+                document.getElementById('total-invested').innerText = '$' + totalInvested.toLocaleString();
+                document.getElementById('current-value').innerText = '$' + finalValue.toLocaleString(undefined, {maximumFractionDigits: 2});
+                
+                const roiEl = document.getElementById('roi');
+                const profitEl = document.getElementById('profit-amt');
+                
+                roiEl.innerText = (roi > 0 ? '+' : '') + roi.toFixed(2) + '%';
+                profitEl.innerText = (profit > 0 ? '+' : '') + '$' + profit.toLocaleString(undefined, {maximumFractionDigits: 2});
+
+                if(profit >= 0) {
+                    roiEl.className = 'big-num profit-plus';
+                    profitEl.className = 'profit-plus';
+                } else {
+                    roiEl.className = 'big-num profit-minus';
+                    profitEl.className = 'profit-minus';
+                }
+
+                resultBox.style.display = 'block';
+
+            } catch (err) {
+                alert("数据获取失败，可能是请求太频繁，请稍后再试。");
+                console.error(err);
+            } finally {
+                btn.innerText = "开始计算";
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
