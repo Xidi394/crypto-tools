@@ -9,18 +9,13 @@
     <style>
         :root { --bg: #f8f9fa; --card-bg: #ffffff; --text: #1e293b; --accent: #3b82f6; }
         body.dark-mode { --bg: #0f172a; --card-bg: #1e293b; --text: #f1f5f9; --accent: #60a5fa; }
-        
         body { background-color: var(--bg); color: var(--text); transition: 0.3s; margin: 0; }
         .card { background-color: var(--card-bg); transition: 0.3s; }
-        
-        /* 输入框样式适配 */
         body.dark-mode input, body.dark-mode select { background-color: #334155; color: white; border-color: #475569; }
-        
-        /* 加载动画 */
         .spinner { border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 3px solid #fff; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* --- 新增：联想下拉菜单样式 (完全参考 dtsyjsq.txt) --- */
+        /* 联想下拉菜单 */
         .custom-dropdown {
             position: absolute; top: 100%; left: 0; right: 0;
             background: white; border: 1px solid #e5e7eb; border-radius: 0.5rem;
@@ -28,16 +23,11 @@
             max-height: 300px; overflow-y: auto; z-index: 50; display: none;
         }
         body.dark-mode .custom-dropdown { background: #1e293b; border-color: #475569; }
-        
-        .dropdown-item {
-            display: flex; align-items: center; padding: 10px 12px;
-            cursor: pointer; transition: background 0.1s; border-bottom: 1px solid #f3f4f6;
-        }
+        .dropdown-item { display: flex; align-items: center; padding: 10px 12px; cursor: pointer; transition: background 0.1s; border-bottom: 1px solid #f3f4f6; }
         body.dark-mode .dropdown-item { border-color: #334155; }
         body.dark-mode .dropdown-item:hover { background-color: #334155; }
         .dropdown-item:hover { background-color: #f1f5f9; }
         .dropdown-item:last-child { border-bottom: none; }
-        
         .coin-icon { width: 28px; height: 28px; margin-right: 12px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
         .avatar-fallback { width: 28px; height: 28px; margin-right: 12px; border-radius: 50%; background-color: #3b82f6; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; flex-shrink: 0; }
     </style>
@@ -90,9 +80,9 @@
                     <div class="flex flex-col space-y-1">
                         <label class="text-sm font-medium opacity-70"><span data-i18n="bt_freq">Frequency</span> <span class="text-red-500">*</span></label>
                         <select id="frequency" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition bg-transparent">
-                            <option value="1">1 Day (每天)</option>
-                            <option value="7" selected>7 Days (每周)</option>
-                            <option value="30">30 Days (每月)</option>
+                            <option value="1">1 Day</option>
+                            <option value="7" selected>7 Days</option>
+                            <option value="30">30 Days</option>
                         </select>
                     </div>
                 </div>
@@ -177,7 +167,6 @@
             return `https://lcw.nyc3.cdn.digitaloceanspaces.com/production/currencies/64/${symbol.toLowerCase()}.png`;
         }
 
-        // --- 2. 下拉菜单逻辑 ---
         const coinInput = document.getElementById('coinSymbol');
         const coinDropdown = document.getElementById('coinDropdown');
 
@@ -186,7 +175,6 @@
             const text = filterText.toUpperCase();
             const filtered = popularCoins.filter(c => c.s.includes(text) || c.n.toUpperCase().includes(text));
 
-            // 如果没有匹配，显示用户输入的
             if (filtered.length === 0 && text.length > 0) {
                  const div = document.createElement('div');
                  div.className = 'dropdown-item';
@@ -194,7 +182,6 @@
                  div.onclick = () => selectCoin(text);
                  coinDropdown.appendChild(div);
             } else {
-                // 显示匹配列表
                 filtered.forEach(coin => {
                     const div = document.createElement('div');
                     div.className = 'dropdown-item';
@@ -216,34 +203,28 @@
             document.getElementById('err-coin').classList.add('hidden');
         }
 
-        // 绑定搜索事件
         coinInput.addEventListener('input', (e) => renderDropdown(e.target.value));
         coinInput.addEventListener('focus', () => renderDropdown(coinInput.value));
-        // 点击外部隐藏
         document.addEventListener('click', (e) => {
             if (!coinInput.contains(e.target) && !coinDropdown.contains(e.target)) {
                 coinDropdown.style.display = 'none';
             }
         });
 
-        // --- 3. 全局变量与初始化 ---
+        // --- 2. 逻辑 ---
         window.currentRecords = [];
         window.myChart = null;
         window.currentPage = 1;
         const itemsPerPage = 10;
 
         window.pageInit = function() {
-            // 设置日期限制：结束时间最大为今天
             const today = new Date().toISOString().split('T')[0];
+            const lastYear = new Date(new Date().setFullYear(new Date().getFullYear() - 1)).toISOString().split('T')[0];
             document.getElementById('endDate').max = today;
             document.getElementById('endDate').value = today;
-            
-            // 默认开始时间：一年前
-            const lastYear = new Date(new Date().setFullYear(new Date().getFullYear() - 1)).toISOString().split('T')[0];
             document.getElementById('startDate').max = today;
             document.getElementById('startDate').value = lastYear;
             
-            // 绑定按钮
             document.getElementById('calcBtn').onclick = calculateDCA;
             document.getElementById('resetBtn').onclick = resetForm;
             document.getElementById('downloadBtn').onclick = downloadCSV;
@@ -255,20 +236,17 @@
             }
         };
 
-        // --- 4. 核心计算逻辑 (带智能数据抓取) ---
         async function calculateDCA() {
             const btn = document.getElementById('calcBtn');
             const originalText = btn.innerHTML;
             const msgBox = document.getElementById('dateFixMsg');
-            msgBox.classList.add('hidden'); // 隐藏旧提示
+            msgBox.classList.add('hidden'); 
 
-            // 1. 必填校验
             let hasError = false;
             ['coinSymbol', 'investAmount', 'startDate', 'endDate'].forEach(id => {
                 const el = document.getElementById(id);
                 const err = document.getElementById('err-' + (id==='coinSymbol'?'coin':id==='investAmount'?'amount':id==='startDate'?'start':'end'));
-                if(!el.value) { err.classList.remove('hidden'); hasError = true; } 
-                else { err.classList.add('hidden'); }
+                if(!el.value) { err.classList.remove('hidden'); hasError = true; } else { err.classList.add('hidden'); }
             });
             if(hasError) return;
 
@@ -285,38 +263,31 @@
                 let startTs = Math.floor(new Date(startStr).getTime() / 1000);
                 const endTs = Math.floor(new Date(endStr).getTime() / 1000);
                 
-                // 2. 智能抓取数据 (一次性抓取足够多的历史)
-                // 这里我们抓取到用户选择的结束时间为止的2000条数据
                 const url = `https://min-api.cryptocompare.com/data/v2/histoday?fsym=${coinSymbol}&tsym=USDT&limit=2000&toTs=${endTs}`;
                 const res = await fetch(url);
                 const json = await res.json();
                 
                 if (json.Response === 'Error') throw new Error(json.Message);
 
-                const prices = json.Data.Data; // 价格数组 [{time, close}, ...]
+                const prices = json.Data.Data; 
                 
-                // 3. 智能日期修正逻辑
-                // 如果API返回的最早数据比用户选的开始时间还晚，说明用户选太早了
                 if (prices.length > 0) {
                     const firstApiTime = prices[0].time;
                     if (startTs < firstApiTime) {
                         const newDate = new Date(firstApiTime * 1000).toISOString().split('T')[0];
-                        // 修正 StartTs 和 输入框
                         startTs = firstApiTime;
                         document.getElementById('startDate').value = newDate;
-                        // 显示提示
-                        const tFix = currentLang === 'zh' ? 
-                            `已自动修正：${coinSymbol} 的最早数据始于 ${newDate}，计算将从该日期开始。` : 
-                            `Auto-corrected: ${coinSymbol} data starts from ${newDate}. Calculation adjusted.`;
+                        const tFix = document.documentElement.lang === 'zh' ? 
+                            `已自动修正：${coinSymbol} 的最早数据始于 ${newDate}。` : 
+                            `Auto-corrected: ${coinSymbol} data starts from ${newDate}.`;
                         document.getElementById('dateFixText').innerText = tFix;
                         msgBox.classList.remove('hidden');
                     }
                 }
 
                 const relevantData = prices.filter(p => p.time >= startTs);
-                if (relevantData.length === 0) throw new Error("No Data in this range");
+                if (relevantData.length === 0) throw new Error("No Data");
 
-                // 4. 定投回测计算
                 window.currentRecords = [];
                 let totalInvestedUSD = 0;
                 let totalCoins = 0;
@@ -381,6 +352,7 @@
             const ctx = document.getElementById('dcaChart').getContext('2d');
             if (window.myChart) window.myChart.destroy();
             
+            // 核心修复：获取当前货币符号和翻译
             const curr = localStorage.getItem('currency') || 'USD';
             const t = (k) => window.getTrans ? window.getTrans(k) : k;
 
@@ -394,16 +366,48 @@
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: t('chart_qty'), data: quantities, type: 'bar', backgroundColor: 'rgba(59, 130, 246, 0.5)', yAxisID: 'y1', order: 2 },
-                        { label: t('chart_avg') + ` (${curr})`, data: avgPrices, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.4, pointRadius: 0, yAxisID: 'y', order: 1 },
-                        { label: t('chart_mkt') + ` (${curr})`, data: mktPrices, borderColor: '#f59e0b', borderDash: [5, 5], pointRadius: 0, tension: 0.4, yAxisID: 'y', order: 0 }
+                        { 
+                            label: t('chart_single'), // 修复：显示“单次买入数量”
+                            data: quantities, 
+                            type: 'bar', 
+                            backgroundColor: 'rgba(59, 130, 246, 0.5)', 
+                            yAxisID: 'y1', 
+                            order: 2 
+                        },
+                        { 
+                            label: t('chart_avg') + ` (${curr})`, 
+                            data: avgPrices, 
+                            borderColor: '#3b82f6', 
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)', 
+                            fill: true, tension: 0.4, pointRadius: 0, yAxisID: 'y', order: 1 
+                        },
+                        { 
+                            label: t('chart_mkt') + ` (${curr})`, 
+                            data: mktPrices, 
+                            borderColor: '#f59e0b', 
+                            borderDash: [5, 5], 
+                            pointRadius: 0, tension: 0.4, yAxisID: 'y', order: 0 
+                        }
                     ]
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false, interaction: { intersect: false, mode: 'index' },
-                    plugins: { legend: { position: 'top' }, tooltip: { callbacks: { label: function(c) { 
-                        return c.dataset.yAxisID === 'y1' ? c.dataset.label + ': ' + c.parsed.y : c.dataset.label + ': ' + formatMoney(c.parsed.y);
-                    }}}},
+                    plugins: { 
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) label += ': ';
+                                    if (context.dataset.yAxisID === 'y1') {
+                                        return label + context.parsed.y.toFixed(6);
+                                    } else {
+                                        return label + formatMoney(context.parsed.y);
+                                    }
+                                }
+                            }
+                        }
+                    },
                     scales: {
                         x: { display: false },
                         y: { position: 'right', grid: { color: document.body.classList.contains('dark-mode') ? '#334155' : '#f1f5f9' } },
