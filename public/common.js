@@ -9,27 +9,14 @@ const exchangeRates = {
     "KRW": { rate: 1430, symbol: "₩" }
 };
 
-const statusTranslations = {
-    "en": {
-        "daily": "⚡ Daily", "weekly": "📅 Weekly", 
-        "stop_high": "🚫 Wait", "buy_1": "😐 Normal", "buy_2": "🙂 Value", "buy_4": "😄 Buy", "buy_8": "🤩 Strong Buy", "buy_16": "💎 All In",
-        "cant_buy_top": "☠️ TOP", "safe": "✅ Safe", "elevated": "⚠️ Warm", "high_risk": "🔥 Risk", "top_danger": "☠️ ESCAPE"
-    },
-    "zh": {
-        "daily": "⚡ 每日定投", "weekly": "📅 每周定投", 
-        "stop_high": "🚫 暂停", "buy_1": "😐 正常", "buy_2": "🙂 低估", "buy_4": "😄 抄底", "buy_8": "🤩 极度低估", "buy_16": "💎 钻石底",
-        "cant_buy_top": "☠️ 顶部", "safe": "✅ 安全", "elevated": "⚠️ 升温", "high_risk": "🔥 高风险", "top_danger": "☠️ 快跑"
-    },
-    // 日韩语略，逻辑一致，自动回落英文
-};
-
 const translations = {
     "en": {
         app_name: "Crypto Tools",
         menu_home: "🏠 Dashboard",
         menu_backtest: "📉 Backtest",
         settings: "Settings", lang_sel: "Language", close: "Close",
-        // --- 新增：回测页面专用词汇 ---
+        
+        // --- 回测页面核心 ---
         bt_title: "DCA Calculator",
         bt_desc: "Calculate crypto DCA returns with historical data.",
         bt_settings: "Backtest Settings",
@@ -40,6 +27,8 @@ const translations = {
         bt_freq: "Frequency",
         bt_btn_reset: "Reset",
         bt_btn_calc: "Calculate Now",
+        
+        // --- 结果面板 ---
         bt_res_title: "Analysis Result",
         bt_total_coins: "Total Coins",
         bt_est_profit: "Est. Profit",
@@ -47,14 +36,30 @@ const translations = {
         bt_curr_val: "Current Value",
         bt_avg_price: "Avg Price",
         bt_count: "Count",
-        bt_download: "Download CSV"
+        
+        // --- 图表与表格 (新增) ---
+        bt_chart_qty: "Accumulated Coins",
+        bt_chart_avg: "Avg DCA Price",
+        bt_chart_mkt: "Market Price",
+        bt_table_title: "Detailed Records",
+        bt_download: "Download CSV",
+        
+        // 表头
+        th_date: "Date",
+        th_invest: "Invested",
+        th_price: "Price",
+        th_coins: "Coins",
+        th_total_inv: "Total Inv.",
+        th_total_coins: "Total Coins",
+        th_avg: "Avg Price"
     },
     "zh": {
         app_name: "花小寒工具箱",
         menu_home: "🏠 行情看板",
         menu_backtest: "📉 定投回测",
         settings: "设置", lang_sel: "语言", close: "关闭",
-        // --- 新增：回测页面专用词汇 ---
+        
+        // --- 回测页面核心 ---
         bt_title: "加密货币定投收益计算器",
         bt_desc: "基于真实历史数据回测，智能计算定投 (DCA) 投资回报率",
         bt_settings: "回测参数设置",
@@ -65,6 +70,8 @@ const translations = {
         bt_freq: "定投频率",
         bt_btn_reset: "一键重置",
         bt_btn_calc: "立即回测结果",
+        
+        // --- 结果面板 ---
         bt_res_title: "回测结果分析",
         bt_total_coins: "累计持仓",
         bt_est_profit: "预估收益",
@@ -72,61 +79,61 @@ const translations = {
         bt_curr_val: "当前价值",
         bt_avg_price: "持仓均价",
         bt_count: "定投次数",
-        bt_download: "下载记录 (.csv)"
+        
+        // --- 图表与表格 (新增) ---
+        bt_chart_qty: "定投数量 (左轴)",
+        bt_chart_avg: "定投均价 (右轴)",
+        bt_chart_mkt: "市场价格 (右轴)",
+        bt_table_title: "详细定投记录",
+        bt_download: "下载记录 (.csv)",
+        
+        // 表头
+        th_date: "日期",
+        th_invest: "本期投入",
+        th_price: "成交价",
+        th_coins: "获得数量",
+        th_total_inv: "累计投入",
+        th_total_coins: "累计持仓",
+        th_avg: "持仓均价"
     },
+    // 日韩语略，逻辑同上
     "ja": {
         app_name: "仮想通貨ツール",
         menu_home: "🏠 市況ボード",
         menu_backtest: "📉 積立シミュレーション",
         settings: "設定", lang_sel: "言語", close: "閉じる",
-        // --- 新增：回测页面专用词汇 ---
-        bt_title: "積立投資計算機 (DCA)",
-        bt_desc: "過去のデータに基づいて積立投資の収益を計算します",
+        bt_title: "積立投資計算機",
+        bt_desc: "過去データに基づくDCA収益シミュレーション",
         bt_settings: "パラメータ設定",
-        bt_coin: "通貨 (BTC等)",
-        bt_amount: "投資額",
-        bt_start: "開始日",
-        bt_end: "終了日",
-        bt_freq: "頻度",
-        bt_btn_reset: "リセット",
-        bt_btn_calc: "計算する",
-        bt_res_title: "分析結果",
-        bt_total_coins: "保有数量",
-        bt_est_profit: "予想収益",
-        bt_invested: "投資総額",
-        bt_curr_val: "現在の価値",
-        bt_avg_price: "平均取得単価",
-        bt_count: "回数",
-        bt_download: "CSVダウンロード"
+        bt_coin: "通貨", bt_amount: "投資額", bt_start: "開始日", bt_end: "終了日", bt_freq: "頻度",
+        bt_btn_reset: "リセット", bt_btn_calc: "計算開始",
+        bt_res_title: "分析結果", bt_total_coins: "保有数量", bt_est_profit: "予想収益",
+        bt_invested: "投資総額", bt_curr_val: "現在価値", bt_avg_price: "平均単価", bt_count: "回数",
+        bt_chart_qty: "積立数量", bt_chart_avg: "平均単価", bt_chart_mkt: "市場価格",
+        bt_table_title: "詳細記録", bt_download: "CSVダウンロード",
+        th_date: "日付", th_invest: "投資額", th_price: "価格", th_coins: "数量", th_total_inv: "累計投資", th_total_coins: "累計数量", th_avg: "平均単価"
     },
     "ko": {
         app_name: "암호화폐 도구",
         menu_home: "🏠 시세 현황",
         menu_backtest: "📉 DCA 백테스트",
         settings: "설정", lang_sel: "언어", close: "닫기",
-        // --- 新增：回测页面专用词汇 ---
         bt_title: "적립식 투자 계산기",
-        bt_desc: "과거 데이터를 기반으로 DCA 수익률을 계산합니다",
-        bt_settings: "백테스트 설정",
-        bt_coin: "코인 (BTC)",
-        bt_amount: "투자금",
-        bt_start: "시작일",
-        bt_end: "종료일",
-        bt_freq: "주기",
-        bt_btn_reset: "초기화",
-        bt_btn_calc: "계산하기",
-        bt_res_title: "분석 결과",
-        bt_total_coins: "보유 수량",
-        bt_est_profit: "예상 수익",
-        bt_invested: "총 투자금",
-        bt_curr_val: "현재 가치",
-        bt_avg_price: "평단가",
-        bt_count: "횟수",
-        bt_download: "CSV 다운로드"
+        bt_desc: "과거 데이터 기반 DCA 수익률 계산",
+        bt_settings: "설정",
+        bt_coin: "코인", bt_amount: "투자금", bt_start: "시작일", bt_end: "종료일", bt_freq: "주기",
+        bt_btn_reset: "초기화", bt_btn_calc: "계산하기",
+        bt_res_title: "분석 결과", bt_total_coins: "보유 수량", bt_est_profit: "예상 수익",
+        bt_invested: "총 투자금", bt_curr_val: "현재 가치", bt_avg_price: "평단가", bt_count: "횟수",
+        bt_chart_qty: "적립 수량", bt_chart_avg: "평단가", bt_chart_mkt: "시장 가격",
+        bt_table_title: "상세 기록", bt_download: "CSV 다운로드",
+        th_date: "날짜", th_invest: "투자금", th_price: "가격", th_coins: "수량", th_total_inv: "누적 투자", th_total_coins: "누적 수량", th_avg: "평단가"
     }
 };
 
-let currentLang = localStorage.getItem('lang') || 'zh';
+let currentLang = localStorage.getItem('lang') || navigator.language.slice(0, 2) || 'zh';
+if (!translations[currentLang]) currentLang = 'en';
+
 let currentCurrency = localStorage.getItem('currency') || 'USD';
 let isDark = localStorage.getItem('theme') === 'dark';
 
@@ -136,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof window.pageInit === 'function') window.pageInit();
 });
 
-// 动态注入导航栏（完全隐藏式侧边栏）
+// 动态注入导航栏
 function injectNavigation() {
     const navHTML = `
     <div id="global-nav" style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px; background:var(--card-bg); border-bottom:1px solid rgba(0,0,0,0.05); position:relative; z-index:50;">
@@ -182,10 +189,8 @@ function injectNavigation() {
     </style>
     `;
     
-    // 防止重复插入
     const oldNav = document.getElementById('global-nav');
     if(oldNav) oldNav.remove();
-    
     document.body.insertAdjacentHTML('afterbegin', navHTML);
 }
 
@@ -193,32 +198,21 @@ function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebar-overlay');
     const isClosed = sidebar.style.transform === 'translateX(-100%)';
-    
-    if (isClosed) {
-        sidebar.style.transform = 'translateX(0)';
-        overlay.style.display = 'block';
-    } else {
-        sidebar.style.transform = 'translateX(-100%)';
-        overlay.style.display = 'none';
-    }
+    if (isClosed) { sidebar.style.transform = 'translateX(0)'; overlay.style.display = 'block'; } 
+    else { sidebar.style.transform = 'translateX(-100%)'; overlay.style.display = 'none'; }
 }
 
 function applySettings() {
-    // 1. 同步夜间模式
     if (isDark) document.body.classList.add('dark-mode'); else document.body.classList.remove('dark-mode');
-    
-    // 2. 同步下拉框
     const langSelect = document.getElementById('sidebar-lang'); if(langSelect) langSelect.value = currentLang;
     const currSelect = document.getElementById('global-currency'); if(currSelect) currSelect.value = currentCurrency;
 
-    // 3. 执行翻译 (查找所有带有 data-i18n 的元素)
     const t = translations[currentLang] || translations['en'];
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (t[key]) el.innerText = t[key];
     });
 
-    // 4. 通知页面刷新 (如果页面定义了 refreshData)
     if (typeof window.refreshData === 'function') window.refreshData();
 }
 
@@ -231,10 +225,13 @@ function formatMoney(usdAmount) {
     if (usdAmount === undefined || usdAmount === null) return "--";
     const info = exchangeRates[currentCurrency] || exchangeRates["USD"];
     const converted = usdAmount * info.rate;
-    return info.symbol + " " + converted.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    // 如果是日元/韩元，不显示小数位；其他货币显示2位
+    const digits = (currentCurrency === 'JPY' || currentCurrency === 'KRW') ? 0 : 2;
+    return info.symbol + " " + converted.toLocaleString(undefined, { minimumFractionDigits: digits, maximumFractionDigits: digits });
 }
 
-function getStatusText(code) {
-    const dict = statusTranslations[currentLang] || statusTranslations['en'];
-    return dict[code] || code;
+// 获取翻译文本的辅助函数（用于Chart.js等JS内部文字）
+function getTrans(key) {
+    const t = translations[currentLang] || translations['en'];
+    return t[key] || key;
 }
