@@ -20,20 +20,20 @@
 <body>
     <div class="container">
         <div class="card">
-            <div style="text-align: center; opacity: 0.7; font-size: 12px;">Total Net Worth (Est.)</div>
+            <div style="text-align: center; opacity: 0.7; font-size: 12px;" data-i18n="total_net_worth">Total Net Worth (Est.)</div>
             <div class="total-asset" id="total-val">--</div>
-            <div style="text-align: center; font-size: 12px; color: var(--accent);">🔒 Data stored locally on device</div>
+            <div style="text-align: center; font-size: 12px; color: var(--accent);" data-i18n="ledger_local_tip">🔒 Data stored locally on device</div>
         </div>
 
         <div class="card">
-            <h3>My Assets</h3>
+            <h3 data-i18n="my_assets">My Assets</h3>
             <table id="asset-table">
                 <thead>
                     <tr>
-                        <th>Coin</th>
-                        <th>Amount</th>
-                        <th>Cost($)</th>
-                        <th>Action</th>
+                        <th data-i18n="th_asset_coin">Coin</th>
+                        <th data-i18n="th_asset_amt">Amount</th>
+                        <th data-i18n="th_asset_cost">Cost($)</th>
+                        <th data-i18n="th_asset_act">Action</th>
                     </tr>
                 </thead>
                 <tbody id="asset-list"></tbody>
@@ -41,30 +41,25 @@
         </div>
 
         <div class="card">
-            <h3>Add Transaction</h3>
+            <h3 data-i18n="add_transaction">Add Transaction</h3>
             <input type="text" id="coin-symbol" placeholder="Symbol (e.g. BTC)" style="text-transform: uppercase;">
             <input type="number" id="coin-amount" placeholder="Amount (e.g. 0.1)">
             <input type="number" id="coin-cost" placeholder="Avg Cost Price (Optional)">
-            <button class="btn" onclick="addAsset()">Add to Ledger</button>
+            <button class="btn" onclick="addAsset()" data-i18n="btn_add_ledger">Add to Ledger</button>
         </div>
         
         <div style="text-align: center; margin-top: 20px;">
-             <button onclick="exportData()" style="background:none; border:1px solid var(--text); padding:5px 15px; border-radius:20px; color:var(--text); cursor:pointer;">📥 Backup Data (.json)</button>
+             <button onclick="exportData()" style="background:none; border:1px solid var(--text); padding:5px 15px; border-radius:20px; color:var(--text); cursor:pointer;" data-i18n="btn_backup">📥 Backup Data (.json)</button>
         </div>
     </div>
 
     <script src="common.js"></script>
     <script>
-        // 简单的本地存储逻辑
         let assets = JSON.parse(localStorage.getItem('my_assets') || '[]');
 
         function renderAssets() {
             const tbody = document.getElementById('asset-list');
             tbody.innerHTML = '';
-            let totalUSD = 0;
-            
-            // 获取当前汇率 (从 common.js 的全局变量)
-            const btcPrice = exchangeRates['USD'] ? 100000 : 0; // 这里的逻辑后续需要对接实时价格 API
             
             assets.forEach((item, index) => {
                 const tr = document.createElement('tr');
@@ -76,7 +71,6 @@
                 `;
                 tbody.appendChild(tr);
             });
-            // 暂时只显示占位符，因为还没有对接所有币种的实时价格
             document.getElementById('total-val').innerText = "Calculate Later"; 
         }
 
@@ -88,7 +82,6 @@
                 assets.push({ symbol: sym, amount: amt, cost: cost });
                 save();
                 renderAssets();
-                // 清空输入
                 document.getElementById('coin-symbol').value = '';
                 document.getElementById('coin-amount').value = '';
             }
@@ -116,7 +109,6 @@
             downloadAnchorNode.remove();
         }
 
-        // 初始化
         window.pageInit = function() { renderAssets(); };
     </script>
 </body>
