@@ -1,167 +1,190 @@
-// 翻译字典
+// ==========================================
+// 1. 全局配置与汇率定义
+// ==========================================
+const exchangeRates = {
+    "USD": { rate: 1, symbol: "$" },
+    "CNY": { rate: 7.25, symbol: "¥" },
+    "HKD": { rate: 7.8, symbol: "HK$" },
+    "JPY": { rate: 150, symbol: "JP¥" },
+    "KRW": { rate: 1380, symbol: "₩" }
+};
+
 const translations = {
     "en": {
-        title: "Hua Xiaohan - Crypto Tools",
-        desc: "Professional Ahr999 & Bitcoin DCA Analysis Tool",
-        price: "Bitcoin Price",
-        ahr_label: "Ahr999 Index (Bottom)",
-        mayer_label: "Escape Top (Mayer/MVRV)",
-        strategy: "Strategy",
-        calc_title: "Smart DCA Calculator",
-        base_amt: "Base Amount (1 Unit)",
-        buy_this_round: "Invest Amount",
-        refresh: "Refresh Data",
-        freq_label: "Frequency:",
-        freq_daily: "Daily Invest (24h)",
-        freq_weekly: "Weekly Invest (7d)",
-        disclaimer_title: "Disclaimer",
-        disclaimer_text: "Data provided by 'Hua Xiaohan' is for reference only. Crypto trading involves high risks. Please DYOR.",
-        
-        // 状态翻译
-        status_stop_high: "🚫 High Price (Wait)",
-        status_buy_1: "😐 Normal Zone (1x)",
-        status_buy_2: "🙂 Undervalued (2x)",
-        status_buy_4: "😄 Buy Zone (4x)",
-        status_buy_8: "🤩 Heavy Buy (8x)",
-        status_buy_16: "💎 Diamond Bottom (16x)",
-        status_cant_buy_top: "☠️ TOP SIGNAL (STOP BUY)",
-        status_cant_buy_risk: "🔥 HIGH RISK (STOP BUY)",
-        
-        sell_safe: "✅ Safe Zone",
-        sell_elevated: "⚠️ Heating Up",
-        sell_high_risk: "🔥 High Risk (Consider Sell)",
-        sell_top_danger: "☠️ ESCAPE NOW (Peak)"
+        app_name: "Hua Xiaohan Tools",
+        menu_home: "🏠 Market Dashboard",
+        menu_backtest: "📉 DCA Backtest",
+        menu_ledger: "📒 Ledger (Coming)",
+        settings: "Settings",
+        theme_toggle: "Dark/Light",
+        lang_sel: "Language",
+        curr_sel: "Currency",
+        close: "Close"
     },
     "zh": {
-        title: "花小寒 - 加密货币定投助手",
-        desc: "专业的 Ahr999 指数与比特币定投分析工具",
-        price: "比特币现价",
-        ahr_label: "Ahr999 指数 (抄底)",
-        mayer_label: "逃顶指标 (MVRV参考)",
-        strategy: "当前策略",
-        calc_title: "智能定投计算器",
-        base_amt: "基础金额 (1份)",
-        buy_this_round: "本期应投",
-        refresh: "刷新数据",
-        freq_label: "定投频率:",
-        freq_daily: "⚡ 每日定投 (天投)",
-        freq_weekly: "📅 每周定投 (周投)",
-        disclaimer_title: "免责声明",
-        disclaimer_text: "“花小寒”提供的数据仅供参考，不构成投资建议。加密货币交易具有极高风险，请自行研究 (DYOR)。",
-        
-        status_stop_high: "🚫 价格过高 (暂停)",
-        status_buy_1: "😐 正常定投 (买1份)",
-        status_buy_2: "🙂 低估区间 (买2份)",
-        status_buy_4: "😄 抄底区间 (买4份)",
-        status_buy_8: "🤩 极度低估 (买8份)",
-        status_buy_16: "💎 钻石底 (梭哈 16份)",
-        status_cant_buy_top: "☠️ 顶部确立 (禁止买入)",
-        status_cant_buy_risk: "🔥 高风险 (停止定投)",
-        
-        sell_safe: "✅ 安全区域",
-        sell_elevated: "⚠️ 情绪升温",
-        sell_high_risk: "🔥 高风险 (考虑止盈)",
-        sell_top_danger: "☠️ 顶部预警 (快跑)"
-    },
-    // ... 其他语言保留原样或按需添加 ...
-    "zh-TW": {
-        title: "花小寒 - 加密貨幣定投助手",
-        price: "比特幣現價",
-        ahr_label: "Ahr999 指數",
-        mayer_label: "逃頂指標",
-        base_amt: "基礎金額 (1份)",
-        buy_this_round: "本期應投",
-        refresh: "刷新數據",
-        freq_label: "定投頻率:",
-        freq_daily: "⚡ 每日定投",
-        freq_weekly: "📅 每週定投",
-        disclaimer_title: "免責聲明",
-        disclaimer_text: "僅供參考，不構成投資建議。DYOR。",
-        status_stop_high: "🚫 價格過高 (暫停)",
-        status_buy_1: "😐 正常定投 (1倍)",
-        status_buy_2: "🙂 低估區間 (2倍)",
-        status_buy_4: "😄 抄底區間 (4倍)",
-        status_buy_8: "🤩 極度低估 (8倍)",
-        status_buy_16: "💎 鑽石底 (16倍)",
-        status_cant_buy_top: "☠️ 頂部確立 (禁止買入)",
-        sell_safe: "✅ 安全區域",
-        sell_high_risk: "🔥 高風險",
-        sell_top_danger: "☠️ 頂部預警"
+        app_name: "花小寒工具箱",
+        menu_home: "🏠 行情看板",
+        menu_backtest: "📉 定投回测 (DCA)",
+        menu_ledger: "📒 记账本 (开发中)",
+        settings: "设置",
+        theme_toggle: "夜间/日间",
+        lang_sel: "语言",
+        curr_sel: "货币单位",
+        close: "关闭"
     },
     "ja": {
-        title: "花小寒 - 仮想通貨ツール",
-        price: "BTC価格",
-        ahr_label: "Ahr999指数",
-        mayer_label: "売りシグナル",
-        base_amt: "基本額 (1単位)",
-        buy_this_round: "投資額",
-        refresh: "更新",
-        freq_label: "頻度:",
-        freq_daily: "⚡ 毎日積立",
-        freq_weekly: "📅 毎週積立",
-        disclaimer_title: "免責事項",
-        disclaimer_text: "投資助言ではありません。DYOR。",
-        status_buy_1: "😐 通常 (1倍)",
-        status_buy_2: "🙂 割安 (2倍)",
-        status_buy_16: "💎 底値 (16倍)",
-        status_cant_buy_top: "☠️ 天井 (購入停止)"
+        app_name: "花小寒ツール",
+        menu_home: "🏠 市況ボード",
+        menu_backtest: "📉 積立シミュレーション",
+        menu_ledger: "📒 家計簿 (開発中)",
+        settings: "設定",
+        theme_toggle: "テーマ切替",
+        lang_sel: "言語",
+        curr_sel: "通貨",
+        close: "閉じる"
     },
     "ko": {
-        title: "화샤오한 - 암호화폐 도구",
-        price: "현재 가격",
-        ahr_label: "Ahr999 지수",
-        mayer_label: "매도 지표",
-        base_amt: "기본 투자금",
-        buy_this_round: "투자금",
-        refresh: "새로고침",
-        freq_label: "주기:",
-        freq_daily: "⚡ 매일 투자",
-        freq_weekly: "📅 매주 투자",
-        disclaimer_title: "면책 조항",
-        disclaimer_text: "재정적 조언이 아닙니다. DYOR.",
-        status_buy_1: "😐 일반 (1배)",
-        status_buy_16: "💎 바닥 (16배)",
-        status_cant_buy_top: "☠️ 고점 (매수 금지)"
+        app_name: "Hua Xiaohan 도구",
+        menu_home: "🏠 시세 현황",
+        menu_backtest: "📉 DCA 백테스트",
+        menu_ledger: "📒 장부 (개발 중)",
+        settings: "설정",
+        theme_toggle: "테마 전환",
+        lang_sel: "언어",
+        curr_sel: "통화",
+        close: "닫기"
     }
 };
 
-let currentLang = 'zh';
+// ==========================================
+// 2. 初始化逻辑 (一加载页面就执行)
+// ==========================================
+let currentLang = localStorage.getItem('lang') || 'zh';
+let currentCurrency = localStorage.getItem('currency') || 'USD';
+let isDark = localStorage.getItem('theme') === 'dark';
 
 document.addEventListener('DOMContentLoaded', () => {
-    const savedLang = localStorage.getItem('lang');
-    if (savedLang) {
-        currentLang = savedLang;
-    } else {
-        const browserLang = navigator.language.slice(0, 2);
-        if (translations[browserLang]) currentLang = browserLang;
-    }
+    injectNavigation(); // 1. 插入导航栏
+    applySettings();    // 2. 应用所有设置
     
-    document.getElementById('lang-select').value = currentLang;
-    applyTranslation();
-    
-    if (localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark-mode');
-    }
+    // 如果当前页面有特定的初始化函数，执行它
+    if (typeof window.pageInit === 'function') window.pageInit();
 });
 
-function changeLang() {
-    const select = document.getElementById('lang-select');
-    currentLang = select.value;
-    localStorage.setItem('lang', currentLang);
-    applyTranslation();
-    fetchData(); 
+// ==========================================
+// 3. 动态插入导航栏 (汉堡菜单 + 标题)
+// ==========================================
+function injectNavigation() {
+    const navHTML = `
+    <div id="global-nav" style="display:flex; justify-content:space-between; align-items:center; padding:15px; margin-bottom:20px; background:var(--card-bg); border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+        <div style="display:flex; align-items:center; gap:15px;">
+            <button onclick="toggleSidebar()" style="background:none; border:none; font-size:24px; cursor:pointer; color:var(--text);">☰</button>
+            <div style="font-weight:bold; font-size:18px;">🌸 <span data-i18n="app_name">...</span></div>
+        </div>
+        
+        <div style="display:flex; gap:10px;">
+             <select id="global-currency" onchange="changeCurrency(this.value)" style="padding:5px; border-radius:6px; border:1px solid #ddd;">
+                <option value="USD">USD ($)</option>
+                <option value="CNY">CNY (¥)</option>
+                <option value="HKD">HKD (HK$)</option>
+                <option value="JPY">JPY (JP¥)</option>
+                <option value="KRW">KRW (₩)</option>
+            </select>
+            <button onclick="toggleTheme()" style="background:none; border:none; font-size:18px; cursor:pointer;">🌗</button>
+        </div>
+    </div>
+
+    <div id="sidebar-overlay" onclick="toggleSidebar()" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:none; z-index:998;"></div>
+    <div id="sidebar" style="position:fixed; top:0; left:-250px; width:250px; height:100%; background:var(--card-bg); transition:0.3s; z-index:999; padding:20px; box-shadow:2px 0 10px rgba(0,0,0,0.1); display:flex; flex-direction:column;">
+        <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:15px;" data-i18n="settings">Settings</h3>
+        
+        <a href="index.html" class="nav-link" data-i18n="menu_home">🏠 Home</a>
+        <a href="backtest.html" class="nav-link" data-i18n="menu_backtest">📉 Backtest</a>
+        <a href="#" class="nav-link" style="opacity:0.5;" data-i18n="menu_ledger">📒 Ledger</a>
+        
+        <div style="margin-top:auto; border-top:1px solid #eee; padding-top:20px;">
+            <label style="display:block; margin-bottom:5px; font-size:12px; opacity:0.7;" data-i18n="lang_sel">Language</label>
+            <select id="sidebar-lang" onchange="changeLang(this.value)" style="width:100%; padding:8px; margin-bottom:15px; border-radius:6px;">
+                <option value="zh">中文</option>
+                <option value="en">English</option>
+                <option value="ja">日本語</option>
+                <option value="ko">한국어</option>
+            </select>
+            
+            <button onclick="toggleSidebar()" style="width:100%; padding:10px; background:#f5f5f5; border:none; border-radius:6px; cursor:pointer; color:#333;" data-i18n="close">Close</button>
+        </div>
+    </div>
+    
+    <style>
+        .nav-link { display:block; padding:12px 0; text-decoration:none; color:var(--text); font-weight:bold; font-size:16px; border-bottom:1px solid rgba(0,0,0,0.05); }
+        .nav-link:hover { color: var(--accent); }
+    </style>
+    `;
+    
+    // 插入到 body 的最前面
+    document.body.insertAdjacentHTML('afterbegin', navHTML);
 }
 
-function applyTranslation() {
+// ==========================================
+// 4. 交互逻辑 (开关、切换)
+// ==========================================
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    const isOpen = sidebar.style.left === '0px';
+    
+    sidebar.style.left = isOpen ? '-250px' : '0px';
+    overlay.style.display = isOpen ? 'none' : 'block';
+}
+
+function applySettings() {
+    // 1. 应用夜间模式
+    if (isDark) document.body.classList.add('dark-mode');
+    else document.body.classList.remove('dark-mode');
+    
+    // 2. 同步输入框状态
+    const langSelect = document.getElementById('sidebar-lang');
+    if(langSelect) langSelect.value = currentLang;
+    
+    const currSelect = document.getElementById('global-currency');
+    if(currSelect) currSelect.value = currentCurrency;
+
+    // 3. 执行翻译
     const t = translations[currentLang] || translations['en'];
-    document.title = t.title;
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (t[key]) el.innerText = t[key];
     });
+
+    // 4. 触发页面特定的重新渲染 (如果页面有 refreshData 函数)
+    if (typeof window.refreshData === 'function') window.refreshData();
 }
 
 function toggleTheme() {
-    document.body.classList.toggle('dark-mode');
-    localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+    isDark = !isDark;
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    applySettings();
+}
+
+function changeLang(lang) {
+    currentLang = lang;
+    localStorage.setItem('lang', lang);
+    applySettings();
+}
+
+function changeCurrency(curr) {
+    currentCurrency = curr;
+    localStorage.setItem('currency', curr);
+    applySettings();
+}
+
+// ==========================================
+// 5. 工具函数：金额格式化 (自动换算汇率)
+// ==========================================
+function formatMoney(usdAmount) {
+    const info = exchangeRates[currentCurrency] || exchangeRates["USD"];
+    const converted = usdAmount * info.rate;
+    
+    // 格式化：加逗号，保留2位小数
+    return info.symbol + " " + converted.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
