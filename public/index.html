@@ -5,68 +5,145 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>花小寒 - Crypto Dashboard</title>
     <style>
-        /* 基础样式变量 */
-        :root { --bg: #f8f9fa; --card-bg: #ffffff; --text: #2c3e50; --accent: #3498db; --red: #e74c3c; --green: #2ecc71; }
-        body.dark-mode { --bg: #121212; --card-bg: #1e1e1e; --text: #ecf0f1; --accent: #5dade2; --red: #ff6b6b; --green: #58d68d; }
+        :root { --bg: #f8f9fa; --card-bg: #ffffff; --text: #2c3e50; --accent: #3498db; --red: #e74c3c; --green: #2ecc71; --orange: #f39c12; }
+        body.dark-mode { --bg: #121212; --card-bg: #1e1e1e; --text: #ecf0f1; --accent: #5dade2; --red: #ff6b6b; --green: #58d68d; --orange: #f5b041; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 15px; max-width: 640px; margin: 0 auto; background-color: var(--bg); color: var(--text); transition: 0.3s; }
         .card { background: var(--card-bg); border-radius: 16px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); }
         .price-val { font-size: 42px; font-weight: 800; letter-spacing: -1px; margin: 5px 0; text-align: center; }
         .indicators-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
         .ind-box { background: rgba(0,0,0,0.03); padding: 15px; border-radius: 12px; text-align: center; }
         .ind-val { font-size: 22px; font-weight: bold; display: block; margin-top: 5px; }
+        
+        /* 计算器样式 */
+        .calc-box { border-left: 4px solid var(--accent); }
+        .input-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        input[type="number"] { width: 80px; padding: 8px; border-radius: 6px; border: 1px solid #ccc; text-align: center; font-size: 16px; background: var(--card-bg); color: var(--text); }
+        .result-row { display: flex; justify-content: space-between; align-items: flex-end; padding-top: 15px; border-top: 1px dashed rgba(0,0,0,0.1); }
+        .final-amt { font-size: 28px; font-weight: bold; color: var(--accent); }
+        .freq-badge { font-size: 14px; font-weight: bold; background: rgba(0,0,0,0.05); padding: 4px 10px; border-radius: 4px; display: inline-block; margin-top: 5px; }
     </style>
 </head>
 <body>
+
     <div class="card">
         <div style="text-align: center;">
-            <span style="font-size:12px; opacity:0.7;">Bitcoin Price</span>
+            <span class="label" data-i18n="price_label" style="font-size:12px; opacity:0.7;">Price</span>
             <div id="price" class="price-val">...</div>
         </div>
         
         <div class="indicators-grid">
             <div class="ind-box">
-                <span style="font-size:12px;">Ahr999</span>
+                <span class="label" data-i18n="ahr_label" style="font-size:12px;">Ahr999</span>
                 <span id="ahr-val" class="ind-val">--</span>
                 <div id="buy-status" style="font-size:11px; margin-top:5px; font-weight:bold;">--</div>
             </div>
             <div class="ind-box">
-                <span style="font-size:12px;">Mayer Multiple</span>
+                <span class="label" data-i18n="mayer_label" style="font-size:12px;">Sell Indicator</span>
                 <span id="mayer-val" class="ind-val">--</span>
                 <div id="sell-status" style="font-size:11px; margin-top:5px; font-weight:bold;">--</div>
             </div>
         </div>
     </div>
 
+    <div class="card calc-box">
+        <h3 data-i18n="calc_title" style="margin-top:0;">Calculator</h3>
+        
+        <div class="input-row">
+            <span data-i18n="base_amt">Base Amount (1 Unit)</span>
+            <input type="number" id="base-amount" value="25" oninput="calculate()">
+        </div>
+
+        <div style="margin-bottom: 10px;">
+            <span data-i18n="invest_freq" style="font-size:12px; opacity:0.7;">Frequency:</span>
+            <br>
+            <span id="freq-display" class="freq-badge">--</span>
+        </div>
+
+        <div class="result-row">
+            <div>
+                <span id="multiplier-tag" style="background:var(--accent); color:#fff; padding:2px 8px; border-radius:4px; font-size:12px;">x0</span>
+            </div>
+            <div style="text-align: right;">
+                <span data-i18n="invest_today" style="display:block; font-size:12px; opacity:0.7;">Invest Today</span>
+                <span id="final-amount" class="final-amt">$0</span>
+            </div>
+        </div>
+    </div>
+
     <script src="common.js"></script>
     <script>
-        // 定义一个刷新数据的函数，common.js 会在切换货币时调用它
-        window.refreshData = fetchData;
+        let currentMultiplier = 0;
+        let globalData = null;
+
+        // 刷新数据函数
+        window.refreshData = function() {
+            if(globalData) renderUI(globalData); // 如果已有数据，只是刷新语言和货币
+            else fetchData(); // 如果没数据，去抓取
+        }
 
         async function fetchData() {
             try {
                 const res = await fetch('/api/get-ahr999');
                 const data = await res.json();
-                
-                // 【重点】这里使用 common.js 提供的 formatMoney 函数
-                // 它会自动根据当前选择的 currency (CNY/JPY) 进行换算
-                document.getElementById('price').innerText = formatMoney(data.price);
-                
-                document.getElementById('ahr-val').innerText = data.ahr999;
-                document.getElementById('mayer-val').innerText = data.mayer;
-                
-                // 简单的颜色逻辑
-                const ahr = parseFloat(data.ahr999);
-                document.getElementById('ahr-val').style.color = ahr < 0.45 ? 'var(--green)' : (ahr > 1.2 ? 'var(--red)' : 'var(--text)');
-
-                document.getElementById('buy-status').innerText = data.buySignal;
-                document.getElementById('sell-status').innerText = data.sellSignal;
-
+                globalData = data; // 存下来，方便切换语言时重用
+                renderUI(data);
             } catch (err) {
                 console.error(err);
             }
         }
-        
-        // 初始加载
+
+        function renderUI(data) {
+            // 1. 价格 (自动汇率)
+            document.getElementById('price').innerText = formatMoney(data.price);
+            
+            // 2. 指标数值
+            document.getElementById('ahr-val').innerText = data.ahr999;
+            document.getElementById('mayer-val').innerText = data.mayer;
+
+            // 3. 状态翻译 (使用 common.js 里的 getStatusText)
+            document.getElementById('buy-status').innerText = getStatusText(data.buySignal);
+            document.getElementById('sell-status').innerText = getStatusText(data.sellSignal);
+            document.getElementById('freq-display').innerText = getStatusText(data.frequency);
+
+            // 4. 颜色逻辑
+            const ahr = parseFloat(data.ahr999);
+            const ahrEl = document.getElementById('ahr-val');
+            ahrEl.style.color = ahr < 0.45 ? 'var(--green)' : (ahr > 1.2 ? 'var(--red)' : 'var(--text)');
+
+            const mayer = parseFloat(data.mayer);
+            const mayerEl = document.getElementById('mayer-val');
+            if(mayer > 2.4) mayerEl.style.color = 'var(--red)';
+            else if(mayer > 1.8) mayerEl.style.color = 'var(--orange)';
+            else mayerEl.style.color = 'var(--green)';
+
+            // 5. 频率颜色
+            const freqEl = document.getElementById('freq-display');
+            if(data.frequency === 'daily') {
+                freqEl.style.color = 'var(--red)';
+                freqEl.style.background = 'rgba(231, 76, 60, 0.1)';
+            } else {
+                freqEl.style.color = 'var(--text)';
+                freqEl.style.background = 'rgba(0,0,0,0.05)';
+            }
+
+            // 6. 计算逻辑
+            currentMultiplier = data.multiplier;
+            document.getElementById('multiplier-tag').innerText = 'x ' + currentMultiplier;
+            calculate();
+        }
+
+        function calculate() {
+            const base = document.getElementById('base-amount').value;
+            const total = base * currentMultiplier;
+            
+            // 使用 common.js 的 formatMoney 来显示最终金额 (自动变成 ¥ 或 $)
+            document.getElementById('final-amount').innerText = formatMoney(total);
+            
+            const finalEl = document.getElementById('final-amount');
+            if(currentMultiplier === 0) finalEl.style.color = '#999';
+            else finalEl.style.color = 'var(--accent)';
+        }
+
         setTimeout(fetchData, 500);
     </script>
 </body>
