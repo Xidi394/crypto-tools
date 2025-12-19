@@ -21,70 +21,66 @@
     <div class="max-w-7xl mx-auto space-y-6 md:space-y-8 p-4 md:p-8">
         
         <header class="text-center mb-4 md:mb-8">
-            <h1 class="text-2xl md:text-4xl font-extrabold tracking-tight" data-i18n="bt_title">加密货币定投收益计算器</h1>
-            <p class="text-gray-500 mt-2 text-xs md:text-base" data-i18n="bt_desc">基于真实历史数据回测...</p>
+            <h1 class="text-2xl md:text-4xl font-extrabold tracking-tight" data-i18n="bt_title">DCA Calculator</h1>
+            <p class="text-gray-500 mt-2 text-xs md:text-base" data-i18n="bt_desc">Calculate...</p>
         </header>
 
         <main class="space-y-6">
             <section class="card p-5 md:p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-lg md:text-xl font-bold" data-i18n="bt_settings">回测参数设置</h2>
-                </div>
+                <h2 class="text-lg md:text-xl font-bold mb-6" data-i18n="bt_settings">Settings</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 mb-6">
                     <div class="flex flex-col space-y-1">
-                        <label class="text-sm font-medium opacity-70" data-i18n="bt_coin">定投币种</label>
+                        <label class="text-sm font-medium opacity-70" data-i18n="bt_coin">Symbol</label>
                         <input type="text" id="coinSymbol" value="BTC" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none uppercase transition">
                     </div>
                     <div class="flex flex-col space-y-1">
-                        <label class="text-sm font-medium opacity-70" data-i18n="bt_amount">定投金额 (USDT)</label>
+                        <label class="text-sm font-medium opacity-70" data-i18n="bt_amount">Amount</label>
                         <input type="number" id="investAmount" value="100" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition">
                     </div>
                     <div class="flex flex-col space-y-1">
-                        <label class="text-sm font-medium opacity-70" data-i18n="bt_start">开始时间</label>
-                        <input type="date" id="startDate" min="2009-01-01" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition">
+                        <label class="text-sm font-medium opacity-70" data-i18n="bt_start">Start Date</label>
+                        <input type="date" id="startDate" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition">
                     </div>
                     <div class="flex flex-col space-y-1">
-                        <label class="text-sm font-medium opacity-70" data-i18n="bt_end">结束时间</label>
-                        <input type="date" id="endDate" min="2009-01-01" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition">
+                        <label class="text-sm font-medium opacity-70" data-i18n="bt_end">End Date</label>
+                        <input type="date" id="endDate" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition">
                     </div>
                     <div class="flex flex-col space-y-1">
-                        <label class="text-sm font-medium opacity-70" data-i18n="bt_freq">定投频率</label>
+                        <label class="text-sm font-medium opacity-70" data-i18n="bt_freq">Frequency</label>
                         <select id="frequency" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition bg-transparent">
-                            <option value="1">每天 (Daily)</option>
-                            <option value="7" selected>每7天 (Weekly)</option>
-                            <option value="30">每30天 (Monthly)</option>
+                            <option value="1">1 Day</option>
+                            <option value="7" selected>7 Days</option>
+                            <option value="30">30 Days</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="flex justify-center space-x-4 border-t border-gray-100 pt-6 dark:border-gray-700">
-                    <button onclick="resetForm()" class="px-6 py-2.5 border border-blue-500 text-blue-600 rounded-lg hover:bg-blue-50 transition font-medium" data-i18n="bt_btn_reset">一键重置</button>
-                    <button id="calcBtn" onclick="calculateDCA()" class="px-8 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-lg font-medium" data-i18n="bt_btn_calc">
-                        立即回测结果
-                    </button>
+                    <button id="resetBtn" class="px-6 py-2.5 border border-blue-500 text-blue-600 rounded-lg hover:bg-blue-50 transition font-medium" data-i18n="bt_btn_reset">Reset</button>
+                    <button id="calcBtn" class="px-8 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-lg font-medium" data-i18n="bt_btn_calc">Calculate</button>
                 </div>
             </section>
 
             <section id="resultSection" class="hidden card p-5 md:p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-                <h3 class="text-lg font-bold mb-6" data-i18n="bt_res_title">回测结果分析</h3>
+                <h3 class="text-lg font-bold mb-6" data-i18n="bt_res_title">Results</h3>
                 
                 <div class="bg-slate-50 dark:bg-slate-800 p-4 md:p-6 rounded-xl mb-8 border border-slate-100 dark:border-slate-700">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4 border-b border-slate-200 dark:border-slate-600 mb-4">
                         <div>
-                            <div class="text-xs opacity-60 mb-1" data-i18n="bt_total_coins">累计持仓</div>
+                            <div class="text-xs opacity-60 mb-1" data-i18n="bt_total_coins">Coins</div>
                             <div class="text-xl md:text-3xl font-bold text-blue-600" id="totalCoins">0.00</div>
                         </div>
                         <div>
-                            <div class="text-xs opacity-60 mb-1" data-i18n="bt_est_profit">预估收益</div>
+                            <div class="text-xs opacity-60 mb-1" data-i18n="bt_est_profit">Profit</div>
                             <div class="text-xl md:text-3xl font-bold text-green-600" id="totalProfit">0.00</div>
                         </div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-4">
-                        <div><div class="text-xs opacity-60 mb-1" data-i18n="bt_count">定投次数</div><div class="font-bold" id="totalCount">0</div></div>
-                        <div><div class="text-xs opacity-60 mb-1" data-i18n="bt_invested">投入本金</div><div class="font-bold" id="totalInvested">0</div></div>
-                        <div><div class="text-xs opacity-60 mb-1" data-i18n="bt_curr_val">当前价值</div><div class="font-bold" id="currentValue">0.00</div></div>
-                        <div><div class="text-xs opacity-60 mb-1" data-i18n="bt_avg_price">持仓均价</div><div class="font-bold" id="avgPrice">0.00</div></div>
+                        <div><div class="text-xs opacity-60 mb-1" data-i18n="bt_count">Count</div><div class="font-bold" id="totalCount">0</div></div>
+                        <div><div class="text-xs opacity-60 mb-1" data-i18n="bt_invested">Invested</div><div class="font-bold" id="totalInvested">0</div></div>
+                        <div><div class="text-xs opacity-60 mb-1" data-i18n="bt_curr_val">Value</div><div class="font-bold" id="currentValue">0.00</div></div>
+                        <div><div class="text-xs opacity-60 mb-1" data-i18n="bt_avg_price">Avg Price</div><div class="font-bold" id="avgPrice">0.00</div></div>
                     </div>
                 </div>
 
@@ -95,22 +91,22 @@
 
             <section id="tableSection" class="hidden card rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <div class="p-4 border-b flex justify-between items-center bg-gray-50 dark:bg-slate-800 dark:border-gray-700">
-                    <h3 class="font-bold text-sm md:text-base" data-i18n="bt_table_title">详细定投记录</h3>
-                    <button onclick="downloadCSV()" class="text-xs md:text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1 cursor-pointer transition">
-                        📥 <span data-i18n="bt_download">下载记录</span>
+                    <h3 class="font-bold text-sm md:text-base" data-i18n="bt_table_title">Records</h3>
+                    <button id="downloadBtn" class="text-xs md:text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1 cursor-pointer transition">
+                        📥 <span data-i18n="bt_download">Download</span>
                     </button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-xs md:text-sm text-left">
                         <thead class="bg-gray-50 dark:bg-slate-700 font-medium">
                             <tr>
-                                <th class="px-4 py-3 whitespace-nowrap" data-i18n="th_date">日期</th>
-                                <th class="px-4 py-3 whitespace-nowrap" data-i18n="th_invest">本期投入</th>
-                                <th class="px-4 py-3 whitespace-nowrap" data-i18n="th_price">成交价</th>
-                                <th class="px-4 py-3 whitespace-nowrap" data-i18n="th_coins">获得数量</th>
-                                <th class="px-4 py-3 whitespace-nowrap" data-i18n="th_total_inv">累计投入</th>
-                                <th class="px-4 py-3 whitespace-nowrap" data-i18n="th_total_coins">累计持仓</th>
-                                <th class="px-4 py-3 whitespace-nowrap" data-i18n="th_avg">持仓均价</th>
+                                <th class="px-4 py-3 whitespace-nowrap" data-i18n="th_date">Date</th>
+                                <th class="px-4 py-3 whitespace-nowrap" data-i18n="th_invest">Invest</th>
+                                <th class="px-4 py-3 whitespace-nowrap" data-i18n="th_price">Price</th>
+                                <th class="px-4 py-3 whitespace-nowrap" data-i18n="th_coins">Coins</th>
+                                <th class="px-4 py-3 whitespace-nowrap" data-i18n="th_total_inv">Total Inv</th>
+                                <th class="px-4 py-3 whitespace-nowrap" data-i18n="th_total_coins">Total Coins</th>
+                                <th class="px-4 py-3 whitespace-nowrap" data-i18n="th_avg">Avg Price</th>
                             </tr>
                         </thead>
                         <tbody id="recordTableBody" class="divide-y divide-gray-100 dark:divide-gray-700"></tbody>
@@ -123,22 +119,28 @@
 
     <script src="common.js"></script>
     <script>
-        let currentRecords = [];
-        let myChart = null;
-        let currentPage = 1;
+        // 关键：把变量和函数挂载到 window，确保 HTML onclick 能找到
+        window.currentRecords = [];
+        window.myChart = null;
+        window.currentPage = 1;
         const itemsPerPage = 10;
 
+        // 初始化日期
         window.pageInit = function() {
             const today = new Date().toISOString().split('T')[0];
             const lastYear = new Date(new Date().setFullYear(new Date().getFullYear() - 1)).toISOString().split('T')[0];
             document.getElementById('endDate').value = today;
             document.getElementById('startDate').value = lastYear;
+            
+            // 绑定按钮事件 (比 onclick 属性更安全)
+            document.getElementById('calcBtn').onclick = calculateDCA;
+            document.getElementById('resetBtn').onclick = resetForm;
+            document.getElementById('downloadBtn').onclick = downloadCSV;
         };
 
         window.refreshData = function() {
             if(!document.getElementById('resultSection').classList.contains('hidden')) {
-                // 如果已经有数据，切换语言时需要重新渲染图表和表格以更新文字
-                renderResults(); 
+                renderResults(); // 切换语言时重新渲染
             }
         };
 
@@ -165,10 +167,9 @@
 
                 const prices = json.Data.Data;
                 const relevantData = prices.filter(p => p.time >= startTs);
-                if (relevantData.length === 0) throw new Error("所选时间段无数据");
+                if (relevantData.length === 0) throw new Error("无数据 / No Data");
 
-                // 计算逻辑
-                currentRecords = [];
+                window.currentRecords = [];
                 let totalInvestedUSD = 0;
                 let totalCoins = 0;
                 let nextBuyTs = startTs;
@@ -180,8 +181,7 @@
                             totalCoins += coins;
                             totalInvestedUSD += amount;
                             
-                            // 记录每一笔（用于表格）
-                            currentRecords.push({
+                            window.currentRecords.push({
                                 date: new Date(day.time * 1000).toLocaleDateString(),
                                 invest: amount,
                                 price: day.close,
@@ -189,17 +189,12 @@
                                 totalInv: totalInvestedUSD,
                                 totalCoins: totalCoins,
                                 avgPrice: totalInvestedUSD / totalCoins,
-                                // 图表数据
                                 ts: day.time
                             });
                         }
                         nextBuyTs += freq * 86400;
                     }
-                    // 补充每日市场价格用于画图（即使没买入的那天）
-                    // 简化处理：这里我们只在记录里存了买入点，画图也画买入点
                 }
-
-                // 渲染所有结果
                 renderResults();
 
             } catch (err) {
@@ -211,17 +206,16 @@
         }
 
         function renderResults() {
-            if(currentRecords.length === 0) return;
-            
-            const last = currentRecords[currentRecords.length-1];
+            if(window.currentRecords.length === 0) return;
+            const last = window.currentRecords[window.currentRecords.length-1];
             const coinSymbol = document.getElementById('coinSymbol').value.toUpperCase();
-            const currentPrice = last.price; // 近似取最后一次定投时的价格
-            const finalValueUSD = last.totalCoins * currentPrice;
+            
+            // 使用 common.js 的 formatMoney 自动转汇率
+            const finalValueUSD = last.totalCoins * last.price;
             const profitUSD = finalValueUSD - last.totalInv;
 
-            // 1. 顶部数据卡片
             document.getElementById('totalCoins').innerText = last.totalCoins.toFixed(4) + " " + coinSymbol;
-            document.getElementById('totalCount').innerText = currentRecords.length;
+            document.getElementById('totalCount').innerText = window.currentRecords.length;
             document.getElementById('totalInvested').innerText = formatMoney(last.totalInv);
             document.getElementById('currentValue').innerText = formatMoney(finalValueUSD);
             document.getElementById('totalProfit').innerText = formatMoney(profitUSD);
@@ -231,78 +225,40 @@
             document.getElementById('resultSection').classList.remove('hidden');
             document.getElementById('tableSection').classList.remove('hidden');
 
-            // 2. 画图
             renderChart();
-            
-            // 3. 表格分页
-            currentPage = 1;
+            window.currentPage = 1;
             renderTable();
         }
 
         function renderChart() {
             const ctx = document.getElementById('dcaChart').getContext('2d');
-            if (myChart) myChart.destroy();
+            if (window.myChart) window.myChart.destroy();
+            
+            // 获取翻译
+            const t = (k) => { const dict = translations[currentLang] || translations['en']; return dict[k] || k; };
 
-            const labels = currentRecords.map(r => r.date);
-            // 市场价格 (用红色虚线)
-            const marketPrices = currentRecords.map(r => r.price);
-            // 定投均价 (用蓝色线)
-            const avgPrices = currentRecords.map(r => r.avgPrice);
-            // 定投数量 (用柱状图，在左轴)
-            const quantities = currentRecords.map(r => r.coins);
+            const labels = window.currentRecords.map(r => r.date);
+            const mktPrices = window.currentRecords.map(r => r.price);
+            const avgPrices = window.currentRecords.map(r => r.avgPrice);
+            const quantities = window.currentRecords.map(r => r.coins);
 
-            myChart = new Chart(ctx, {
+            window.myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [
-                        {
-                            label: getTrans('bt_chart_qty'), // 定投数量
-                            data: quantities,
-                            type: 'bar',
-                            backgroundColor: 'rgba(59, 130, 246, 0.5)',
-                            yAxisID: 'y1', // 左轴
-                            order: 2
-                        },
-                        {
-                            label: getTrans('bt_chart_avg'), // 均价
-                            data: avgPrices,
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            fill: true,
-                            tension: 0.4,
-                            pointRadius: 0,
-                            yAxisID: 'y', // 右轴
-                            order: 1
-                        },
-                        {
-                            label: getTrans('bt_chart_mkt'), // 市场价
-                            data: marketPrices,
-                            borderColor: '#f59e0b',
-                            borderDash: [5, 5],
-                            pointRadius: 0,
-                            tension: 0.4,
-                            yAxisID: 'y', // 右轴
-                            order: 0
-                        }
+                        { label: t('bt_chart_qty'), data: quantities, type: 'bar', backgroundColor: 'rgba(59, 130, 246, 0.5)', yAxisID: 'y1', order: 2 },
+                        { label: t('bt_chart_avg'), data: avgPrices, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.4, pointRadius: 0, yAxisID: 'y', order: 1 },
+                        { label: t('bt_chart_mkt'), data: mktPrices, borderColor: '#f59e0b', borderDash: [5, 5], pointRadius: 0, tension: 0.4, yAxisID: 'y', order: 0 }
                     ]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { intersect: false, mode: 'index' },
+                    responsive: true, maintainAspectRatio: false, interaction: { intersect: false, mode: 'index' },
                     plugins: { legend: { position: 'top' } },
                     scales: {
                         x: { display: false },
-                        y: { 
-                            [cite_start]position: 'right', // 价格在右边 [cite: 212]
-                            grid: { color: document.body.classList.contains('dark-mode') ? '#334155' : '#f1f5f9' }
-                        },
-                        y1: {
-                            [cite_start]position: 'left', // 数量在左边 [cite: 214]
-                            grid: { display: false },
-                            display: true
-                        }
+                        y: { position: 'right', grid: { color: document.body.classList.contains('dark-mode') ? '#334155' : '#f1f5f9' } },
+                        y1: { position: 'left', display: true, grid: { display: false } }
                     }
                 }
             });
@@ -311,14 +267,11 @@
         function renderTable() {
             const tbody = document.getElementById('recordTableBody');
             tbody.innerHTML = '';
-            
-            // 倒序显示，最新的在前面
-            const reversed = [...currentRecords].reverse();
-            const start = (currentPage - 1) * itemsPerPage;
+            const reversed = [...window.currentRecords].reverse();
+            const start = (window.currentPage - 1) * itemsPerPage;
             const end = start + itemsPerPage;
-            const pageData = reversed.slice(start, end);
-
-            pageData.forEach(r => {
+            
+            reversed.slice(start, end).forEach(r => {
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-gray-50 dark:hover:bg-slate-700 transition";
                 tr.innerHTML = `
@@ -332,33 +285,26 @@
                 `;
                 tbody.appendChild(tr);
             });
-
-            // 简单分页逻辑
+            
             const totalPages = Math.ceil(reversed.length / itemsPerPage);
             const container = document.getElementById('paginationContainer');
             container.innerHTML = `
-                <button ${currentPage===1?'disabled':''} onclick="currentPage--;renderTable()" class="px-3 py-1 bg-white dark:bg-slate-700 border rounded disabled:opacity-50"><</button>
-                <span class="px-3 py-1 text-sm">Page ${currentPage} / ${totalPages}</span>
-                <button ${currentPage===totalPages?'disabled':''} onclick="currentPage++;renderTable()" class="px-3 py-1 bg-white dark:bg-slate-700 border rounded disabled:opacity-50">></button>
+                <button ${window.currentPage===1?'disabled':''} onclick="window.currentPage--;renderTable()" class="px-3 py-1 bg-white dark:bg-slate-700 border rounded disabled:opacity-50"><</button>
+                <span class="px-3 py-1 text-sm">Page ${window.currentPage} / ${totalPages}</span>
+                <button ${window.currentPage===totalPages?'disabled':''} onclick="window.currentPage++;renderTable()" class="px-3 py-1 bg-white dark:bg-slate-700 border rounded disabled:opacity-50">></button>
             `;
         }
 
         function downloadCSV() {
-            if (currentRecords.length === 0) return;
-            const coinSymbol = document.getElementById('coinSymbol').value.toUpperCase();
-            
-            // CSV头
-            let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += `Date,Invested(USD),Price(USD),Coins,Total Invested(USD),Total Coins,Avg Price(USD)\n`;
-            
-            currentRecords.forEach(r => {
-                csvContent += `${r.date},${r.invest},${r.price},${r.coins},${r.totalInv},${r.totalCoins},${r.avgPrice}\n`;
+            if (window.currentRecords.length === 0) return;
+            const symbol = document.getElementById('coinSymbol').value;
+            let csv = "Date,Invest,Price,Coins,TotalInv,TotalCoins,AvgPrice\n";
+            window.currentRecords.forEach(r => {
+                csv += `${r.date},${r.invest},${r.price},${r.coins},${r.totalInv},${r.totalCoins},${r.avgPrice}\n`;
             });
-
-            const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `DCA_${coinSymbol}_${new Date().toISOString().slice(0,10)}.csv`);
+            link.href = encodeURI("data:text/csv;charset=utf-8," + csv);
+            link.download = `DCA_${symbol}.csv`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
