@@ -19,6 +19,7 @@
 <body class="p-0">
 
     <div class="max-w-7xl mx-auto space-y-6 md:space-y-8 p-4 md:p-8">
+        
         <header class="text-center mb-4 md:mb-8">
             <h1 class="text-2xl md:text-4xl font-extrabold tracking-tight" data-i18n="bt_title">DCA Calculator</h1>
             <p class="text-gray-500 mt-2 text-xs md:text-base" data-i18n="bt_desc">Calculate...</p>
@@ -27,6 +28,7 @@
         <main class="space-y-6">
             <section class="card p-5 md:p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
                 <h2 class="text-lg md:text-xl font-bold mb-6" data-i18n="bt_settings">Settings</h2>
+                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 mb-6">
                     <div class="flex flex-col space-y-1">
                         <label class="text-sm font-medium opacity-70" data-i18n="bt_coin">Symbol</label>
@@ -53,6 +55,7 @@
                         </select>
                     </div>
                 </div>
+
                 <div class="flex justify-center space-x-4 border-t border-gray-100 pt-6 dark:border-gray-700">
                     <button id="resetBtn" class="px-6 py-2.5 border border-blue-500 text-blue-600 rounded-lg hover:bg-blue-50 transition font-medium" data-i18n="bt_btn_reset">Reset</button>
                     <button id="calcBtn" class="px-8 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-lg font-medium" data-i18n="bt_btn_calc">Calculate</button>
@@ -61,6 +64,7 @@
 
             <section id="resultSection" class="hidden card p-5 md:p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
                 <h3 class="text-lg font-bold mb-6" data-i18n="bt_res_title">Results</h3>
+                
                 <div class="bg-slate-50 dark:bg-slate-800 p-4 md:p-6 rounded-xl mb-8 border border-slate-100 dark:border-slate-700">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4 border-b border-slate-200 dark:border-slate-600 mb-4">
                         <div>
@@ -79,6 +83,7 @@
                         <div><div class="text-xs opacity-60 mb-1" data-i18n="bt_avg_price">Avg Price</div><div class="font-bold" id="avgPrice">0.00</div></div>
                     </div>
                 </div>
+
                 <div class="h-80 w-full">
                     <canvas id="dcaChart"></canvas>
                 </div>
@@ -114,7 +119,6 @@
 
     <script src="common.js"></script>
     <script>
-        // 定义全局变量
         window.currentRecords = [];
         window.myChart = null;
         window.currentPage = 1;
@@ -131,7 +135,6 @@
             document.getElementById('downloadBtn').onclick = downloadCSV;
         };
 
-        // 核心修复：当 Common.js 切换货币时，会自动调用这个函数刷新数据
         window.refreshData = function() {
             if(!document.getElementById('resultSection').classList.contains('hidden')) {
                 renderResults(); 
@@ -154,7 +157,6 @@
                 const startTs = Math.floor(new Date(startStr).getTime() / 1000);
                 const endTs = Math.floor(new Date(endStr).getTime() / 1000);
                 
-                // 这里我们统一获取 USDT 价格，然后在展示时用 formatMoney 转换成用户选的货币
                 const url = `https://min-api.cryptocompare.com/data/v2/histoday?fsym=${coinSymbol}&tsym=USDT&limit=2000&toTs=${endTs}`;
                 const res = await fetch(url);
                 const json = await res.json();
@@ -205,7 +207,6 @@
             const last = window.currentRecords[window.currentRecords.length-1];
             const coinSymbol = document.getElementById('coinSymbol').value.toUpperCase();
             
-            // 核心：全部使用 formatMoney 自动转换成 CNY/JPY/KRW
             const finalValueUSD = last.totalCoins * last.price;
             const profitUSD = finalValueUSD - last.totalInv;
 
@@ -229,16 +230,12 @@
             const ctx = document.getElementById('dcaChart').getContext('2d');
             if (window.myChart) window.myChart.destroy();
             
-            // 获取翻译
-            const t = (k) => { 
-                // 简单的翻译 helper，直接读取 common.js 里的 translations
-                // 注意：这里需要手动访问 translations 对象，因为 common.js 没有暴露它
-                // 但我们可以通过 data-i18n 的方式取巧，或者简单的硬编码
-                return k; 
-            };
+            // 核心修复：获取当前货币符号和翻译后的 Label
+            const curr = localStorage.getItem('currency') || 'USD';
+            const t = (k) => window.getTrans ? window.getTrans(k) : k;
 
             const labels = window.currentRecords.map(r => r.date);
-            const mktPrices = window.currentRecords.map(r => r.price); // 这是 USD 价格
+            const mktPrices = window.currentRecords.map(r => r.price);
             const avgPrices = window.currentRecords.map(r => r.avgPrice);
             const quantities = window.currentRecords.map(r => r.coins);
 
@@ -247,14 +244,49 @@
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: 'Accumulated Coins', data: quantities, type: 'bar', backgroundColor: 'rgba(59, 130, 246, 0.5)', yAxisID: 'y1', order: 2 },
-                        { label: 'Avg DCA Price (USD)', data: avgPrices, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.4, pointRadius: 0, yAxisID: 'y', order: 1 },
-                        { label: 'Market Price (USD)', data: mktPrices, borderColor: '#f59e0b', borderDash: [5, 5], pointRadius: 0, tension: 0.4, yAxisID: 'y', order: 0 }
+                        { 
+                            label: t('chart_qty'), // "累计持仓数量"
+                            data: quantities, 
+                            type: 'bar', 
+                            backgroundColor: 'rgba(59, 130, 246, 0.5)', 
+                            yAxisID: 'y1', 
+                            order: 2 
+                        },
+                        { 
+                            label: t('chart_avg') + ` (${curr})`, // "持仓均价 (CNY)"
+                            data: avgPrices, 
+                            borderColor: '#3b82f6', 
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)', 
+                            fill: true, tension: 0.4, pointRadius: 0, yAxisID: 'y', order: 1 
+                        },
+                        { 
+                            label: t('chart_mkt') + ` (${curr})`, // "市场价格 (CNY)"
+                            data: mktPrices, 
+                            borderColor: '#f59e0b', 
+                            borderDash: [5, 5], 
+                            pointRadius: 0, tension: 0.4, yAxisID: 'y', order: 0 
+                        }
                     ]
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false, interaction: { intersect: false, mode: 'index' },
-                    plugins: { legend: { position: 'top' } },
+                    plugins: { 
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) label += ': ';
+                                    // 核心修复：Tooltip 使用 formatMoney 自动带上 ¥ 或 $
+                                    if (context.dataset.yAxisID === 'y1') {
+                                        return label + context.parsed.y;
+                                    } else {
+                                        return label + formatMoney(context.parsed.y);
+                                    }
+                                }
+                            }
+                        }
+                    },
                     scales: {
                         x: { display: false },
                         y: { position: 'right', grid: { color: document.body.classList.contains('dark-mode') ? '#334155' : '#f1f5f9' } },
