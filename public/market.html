@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Data</title>
+    <style>
+        :root { --bg: #f8f9fa; --card-bg: #ffffff; --text: #2c3e50; }
+        body.dark-mode { --bg: #121212; --card-bg: #1e1e1e; --text: #ecf0f1; }
+        body { font-family: -apple-system, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .card { background: var(--card-bg); padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        .market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+        .coin-card { background: rgba(0,0,0,0.03); padding: 15px; border-radius: 8px; text-align: center; }
+        .coin-name { font-weight: bold; display: block; margin-bottom: 5px; }
+        .coin-price { font-size: 18px; color: #2ecc71; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h2>📊 Market Overview</h2>
+            <p style="opacity:0.7; font-size:14px;">Top Currencies & Exchange Data (Integration Pending)</p>
+            
+            <div id="market-grid" class="market-grid">
+                <div class="coin-card">
+                    <span class="coin-name">BTC/USDT</span>
+                    <span class="coin-price" id="price-btc">Loading...</span>
+                </div>
+                <div class="coin-card">
+                    <span class="coin-name">ETH/USDT</span>
+                    <span class="coin-price" id="price-eth">Loading...</span>
+                </div>
+                <div class="coin-card">
+                    <span class="coin-name">SOL/USDT</span>
+                    <span class="coin-price" id="price-sol">Loading...</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3>Exchange Status</h3>
+            <ul style="font-size:14px; opacity:0.8;">
+                <li>🟢 Binance: Operational</li>
+                <li>🟢 OKX: Operational</li>
+                <li>🟡 Coinbase: Maintenance</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="common.js"></script>
+    <script>
+        // 简单的模拟行情获取，未来这里会对接 api/get-market-data
+        async function fetchMarket() {
+            try {
+                const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd');
+                const data = await res.json();
+                
+                document.getElementById('price-btc').innerText = "$" + data.bitcoin.usd;
+                document.getElementById('price-eth').innerText = "$" + data.ethereum.usd;
+                document.getElementById('price-sol').innerText = "$" + data.solana.usd;
+            } catch(e) {
+                console.log("Market data error");
+            }
+        }
+        
+        window.pageInit = function() { fetchMarket(); };
+    </script>
+</body>
+</html>
