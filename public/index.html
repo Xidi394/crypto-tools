@@ -3,96 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>加密货币私人助手 Pro</title>
+    
+    <title>花小寒 (Hua Xiaohan) - Bitcoin Ahr999 & Crypto Tools</title>
+    <meta name="description" content="花小寒 (Hua Xiaohan) is a professional crypto investment tool providing real-time Ahr999 index, DCA calculator, and MVRV-based sell indicators for Bitcoin.">
+    <meta name="keywords" content="花小寒, Hua Xiaohan, Ahr999, Bitcoin DCA, Crypto Tools, MVRV Z-Score, 定投计算器, 比特币抄底">
+    <meta name="author" content="Hua Xiaohan Team">
+    <meta name="robots" content="index, follow">
+
     <style>
-        :root { --bg: #f4f4f9; --card-bg: #fff; --text: #333; --accent: #007bff; --red: #d9534f; --green: #28a745; }
-        body.dark-mode { --bg: #1a1a1a; --card-bg: #2d2d2d; --text: #f0f0f0; --accent: #4da3ff; --red: #ff6b6b; --green: #5cdb5c; }
+        :root { --bg: #f8f9fa; --card-bg: #ffffff; --text: #2c3e50; --accent: #3498db; --red: #e74c3c; --green: #2ecc71; --orange: #f39c12; }
+        body.dark-mode { --bg: #121212; --card-bg: #1e1e1e; --text: #ecf0f1; --accent: #5dade2; --red: #ff6b6b; --green: #58d68d; --orange: #f5b041; }
         
-        body { font-family: 'Segoe UI', sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; background-color: var(--bg); color: var(--text); transition: 0.3s; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .card { background: var(--card-bg); border-radius: 16px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 20px; max-width: 640px; margin: 0 auto; background-color: var(--bg); color: var(--text); transition: 0.3s; line-height: 1.6; }
         
-        h1 { margin: 0; font-size: 24px; }
-        .price-big { font-size: 36px; font-weight: 800; color: var(--text); letter-spacing: -1px; margin: 10px 0; }
-        .label { font-size: 14px; opacity: 0.7; margin-bottom: 4px; display: block; }
+        /* 顶部导航 */
+        .nav-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .logo { font-size: 20px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        .controls { display: flex; gap: 10px; }
+        select { padding: 5px; border-radius: 5px; border: 1px solid #ccc; background: var(--card-bg); color: var(--text); }
         
-        /* 仪表盘样式 */
-        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .stat-box { background: rgba(0,0,0,0.03); padding: 15px; border-radius: 12px; text-align: center; }
-        .stat-value { font-size: 20px; font-weight: bold; display: block; margin-top: 5px; }
-        .ahr-value { color: var(--accent); }
+        /* 卡片通用 */
+        .card { background: var(--card-bg); border-radius: 16px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.05); }
         
-        /* 定投计算器样式 */
-        .invest-card { border: 2px solid var(--accent); position: relative; overflow: hidden; }
-        .invest-badge { position: absolute; top: 0; right: 0; background: var(--accent); color: white; padding: 5px 15px; font-size: 12px; border-bottom-left-radius: 12px; }
+        /* 价格大字 */
+        .price-display { text-align: center; margin-bottom: 20px; }
+        .price-val { font-size: 42px; font-weight: 800; letter-spacing: -1px; margin: 5px 0; }
         
-        .input-group { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; background: rgba(0,0,0,0.03); padding: 10px; border-radius: 8px; }
-        input[type="number"] { background: transparent; border: none; font-size: 18px; width: 80px; color: var(--text); border-bottom: 2px solid var(--accent); text-align: center; outline: none; }
+        /* 指标双栏 */
+        .indicators-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .ind-box { background: rgba(0,0,0,0.03); padding: 15px; border-radius: 12px; text-align: center; }
+        .ind-val { font-size: 22px; font-weight: bold; display: block; margin-top: 5px; }
         
-        .result-box { display: flex; justify-content: space-between; align-items: flex-end; }
-        .buy-action { text-align: right; }
-        .buy-amount { font-size: 32px; font-weight: bold; color: var(--red); display: block; }
-        .buy-desc { font-size: 14px; opacity: 0.8; }
+        /* 状态条 */
+        .status-bar { margin-top: 15px; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; background: rgba(0,0,0,0.03); font-size: 14px; }
         
-        .btn { padding: 8px 16px; cursor: pointer; background: var(--accent); color: white; border: none; border-radius: 8px; font-weight: 500; }
-        .refresh-btn { background: transparent; color: var(--text); border: 1px solid rgba(0,0,0,0.1); }
+        /* 颜色定义 */
+        .c-green { color: var(--green); }
+        .c-red { color: var(--red); }
+        .c-orange { color: var(--orange); }
         
-        /* 状态颜色类 */
-        .status-red { color: var(--red); }
-        .status-green { color: var(--green); }
+        /* 计算器 */
+        .calc-box { border-left: 4px solid var(--accent); }
+        .input-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        input[type="number"] { width: 80px; padding: 8px; border-radius: 6px; border: 1px solid #ccc; text-align: center; font-size: 16px; background: var(--card-bg); color: var(--text); }
+        
+        .result-row { display: flex; justify-content: space-between; align-items: flex-end; padding-top: 15px; border-top: 1px dashed rgba(0,0,0,0.1); }
+        .final-amt { font-size: 28px; font-weight: bold; color: var(--accent); }
+        
+        /* 底部 */
+        .footer { text-align: center; margin-top: 40px; font-size: 12px; opacity: 0.6; padding-bottom: 20px; }
+        .disclaimer { margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.02); border-radius: 8px; text-align: left; font-size: 11px; line-height: 1.5; border: 1px solid rgba(0,0,0,0.05); }
+        
+        button.icon-btn { background: none; border: 1px solid rgba(0,0,0,0.1); border-radius: 50%; width: 32px; height: 32px; cursor: pointer; color: var(--text); }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>🦄 Crypto Pro</h1>
-        <button class="btn" onclick="toggleTheme()">🌗</button>
+    <div class="nav-bar">
+        <div class="logo">🌸 <span data-i18n="title">Hua Xiaohan</span></div>
+        <div class="controls">
+            <select id="lang-select" onchange="changeLang()">
+                <option value="zh">🇨🇳 中文</option>
+                <option value="zh-TW">🇹🇼 繁體</option>
+                <option value="en">🇺🇸 English</option>
+                <option value="ja">🇯🇵 日本語</option>
+                <option value="ko">🇰🇷 한국어</option>
+                <option value="es">🇪🇸 Español</option>
+                <option value="ru">🇷🇺 Русский</option>
+                <option value="de">🇩🇪 Deutsch</option>
+                <option value="fr">🇫🇷 Français</option>
+                <option value="vi">🇻🇳 Tiếng Việt</option>
+            </select>
+            <button class="icon-btn" onclick="toggleTheme()">🌗</button>
+        </div>
     </div>
 
     <div class="card">
-        <span class="label">Bitcoin Price</span>
-        <div id="price" class="price-big">Loading...</div>
+        <div class="price-display">
+            <span class="label" data-i18n="price">Bitcoin Price</span>
+            <div id="price" class="price-val">...</div>
+            <div id="update-time" style="font-size:12px; opacity:0.5;"></div>
+        </div>
         
-        <div class="dashboard-grid">
-            <div class="stat-box">
-                <span class="label">Ahr999 指数</span>
-                <span id="ahr-index" class="stat-value ahr-value">--</span>
+        <div class="indicators-grid">
+            <div class="ind-box">
+                <span class="label" data-i18n="ahr_label" style="font-size:12px;">Ahr999</span>
+                <span id="ahr-val" class="ind-val">--</span>
+                <div id="buy-status" style="font-size:11px; margin-top:5px;">--</div>
             </div>
-            <div class="stat-box">
-                <span class="label">当前状态</span>
-                <span id="strategy-text" class="stat-value">--</span>
+            <div class="ind-box">
+                <span class="label" data-i18n="mayer_label" style="font-size:12px;">Sell Indicator</span>
+                <span id="mayer-val" class="ind-val">--</span>
+                <div id="sell-status" style="font-size:11px; margin-top:5px;">--</div>
             </div>
         </div>
     </div>
 
-    <div class="card invest-card">
-        <div class="invest-badge" id="freq-badge">智能推荐</div>
+    <div class="card calc-box">
+        <h3 data-i18n="calc_title" style="margin-top:0;">Calculator</h3>
         
-        <h3>💰 智能定投计算器</h3>
-        <p class="label">根据 Ahr999 自动计算买入金额</p>
-        
-        <div class="input-group">
-            <span>基础单份金额 (1份):</span>
-            <span style="color:var(--text);">$</span>
-            <input type="number" id="base-amount" value="25" oninput="calculateInvest()">
+        <div class="input-row">
+            <span data-i18n="base_amt">Base Amount</span>
+            <input type="number" id="base-amount" value="100" oninput="calculate()">
         </div>
 
-        <div class="result-box">
+        <div class="result-row">
             <div>
-                <span class="label">推荐倍数</span>
-                <span id="multiplier-display" style="font-size: 24px; font-weight: bold;">x 0</span>
-                <span style="font-size:14px">份</span>
+                <span id="multiplier-tag" style="background:var(--accent); color:#fff; padding:2px 8px; border-radius:4px; font-size:12px;">x0</span>
             </div>
-            <div class="buy-action">
-                <span class="label">本期应买入</span>
-                <span id="final-amount" class="buy-amount">$0</span>
+            <div style="text-align: right;">
+                <span data-i18n="buy_this_round" style="display:block; font-size:12px;">Invest Today</span>
+                <span id="final-amount" class="final-amt">$0</span>
             </div>
         </div>
     </div>
 
-    <div style="text-align: center; margin-top: 20px;">
-        <button class="btn refresh-btn" onclick="fetchData()">🔄 刷新数据</button>
-        <p style="font-size: 12px; opacity: 0.5; margin-top: 10px;">数据源: CoinGecko (200日真实均价)</p>
+    <div style="text-align: center;">
+        <button onclick="fetchData()" style="padding:10px 20px; background:var(--text); color:var(--bg); border:none; border-radius:20px; cursor:pointer;" data-i18n="refresh">Refresh</button>
+    </div>
+
+    <div class="footer">
+        <div class="disclaimer">
+            <strong data-i18n="disclaimer_title">Disclaimer</strong><br>
+            <span data-i18n="disclaimer_text">...</span>
+        </div>
+        <p>© 2025 Hua Xiaohan (花小寒). Powered by CoinGecko.</p>
     </div>
 
     <script src="common.js"></script>
@@ -101,41 +136,48 @@
 
         async function fetchData() {
             const priceEl = document.getElementById('price');
-            const ahrEl = document.getElementById('ahr-index');
-            
-            priceEl.style.opacity = '0.5'; // 加载中效果
+            priceEl.style.opacity = '0.5';
             
             try {
                 const res = await fetch('/api/get-ahr999');
                 const data = await res.json();
                 
-                if(data.error) {
-                    priceEl.innerText = "数据源维护中";
-                    return;
-                }
-
-                // 1. 更新基础数据
+                // 1. 基础数据
                 priceEl.innerText = '$' + data.price.toLocaleString();
-                ahrEl.innerText = data.ahr999;
-                document.getElementById('strategy-text').innerText = data.strategy;
-                document.getElementById('freq-badge').innerText = "建议: " + data.frequency;
+                document.getElementById('ahr-val').innerText = data.ahr999;
+                document.getElementById('mayer-val').innerText = data.mayer;
                 
-                // 2. 颜色逻辑
-                if (data.ahr999 < 0.45) {
-                    ahrEl.style.color = 'var(--green)'; // 抄底绿色
-                    document.getElementById('strategy-text').className = 'stat-value status-green';
-                } else if (data.ahr999 > 1.2) {
-                    ahrEl.style.color = 'var(--red)'; // 逃顶红色
-                    document.getElementById('strategy-text').className = 'stat-value status-red';
-                } else {
-                    ahrEl.style.color = 'var(--accent)';
-                    document.getElementById('strategy-text').className = 'stat-value';
-                }
+                // 2. 获取当前语言包
+                const t = translations[currentLang] || translations['en'];
 
-                // 3. 存储倍数并触发计算
+                // 3. 买入状态翻译
+                const buyKey = 'status_' + data.buySignal;
+                document.getElementById('buy-status').innerText = t[buyKey] || data.buySignal;
+                
+                // 4. 卖出状态翻译
+                const sellKey = 'sell_' + data.sellSignal;
+                const sellEl = document.getElementById('sell-status');
+                sellEl.innerText = t[sellKey] || data.sellSignal;
+                
+                // 5. 颜色逻辑
+                // Ahr 颜色
+                const ahrVal = parseFloat(data.ahr999);
+                const ahrEl = document.getElementById('ahr-val');
+                if(ahrVal < 0.45) ahrEl.className = 'ind-val c-green';
+                else if(ahrVal > 1.2) ahrEl.className = 'ind-val c-red';
+                else ahrEl.className = 'ind-val';
+
+                // Mayer (Sell) 颜色
+                const mayerVal = parseFloat(data.mayer);
+                const mayerEl = document.getElementById('mayer-val');
+                if(mayerVal > 2.4) { mayerEl.className = 'ind-val c-red'; sellEl.className = 'c-red'; }
+                else if(mayerVal > 1.8) { mayerEl.className = 'ind-val c-orange'; sellEl.className = 'c-orange'; }
+                else { mayerEl.className = 'ind-val c-green'; sellEl.className = 'c-green'; }
+
+                // 6. 存储倍数并计算
                 currentMultiplier = data.multiplier;
-                document.getElementById('multiplier-display').innerText = "x " + currentMultiplier;
-                calculateInvest(); // 重新计算金额
+                document.getElementById('multiplier-tag').innerText = 'x ' + currentMultiplier;
+                calculate();
 
             } catch (err) {
                 console.error(err);
@@ -145,24 +187,22 @@
             }
         }
 
-        // 核心计算逻辑：用户输入变了，或者倍数变了，都重新算
-        function calculateInvest() {
+        function calculate() {
             const base = document.getElementById('base-amount').value;
             const total = base * currentMultiplier;
-            
-            // 动画效果显示金额
             const finalEl = document.getElementById('final-amount');
+            
             finalEl.innerText = '$' + total.toLocaleString();
             
-            if (currentMultiplier === 0) {
+            if(currentMultiplier === 0) {
                 finalEl.style.color = '#999';
-                finalEl.innerText = "暂不操作";
             } else {
-                finalEl.style.color = 'var(--red)';
+                finalEl.style.color = 'var(--accent)';
             }
         }
 
-        fetchData();
+        // 页面加载后自动抓取
+        setTimeout(fetchData, 500);
     </script>
 </body>
 </html>
