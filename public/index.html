@@ -66,6 +66,7 @@
         let currentMultiplier = 0;
         let globalData = null;
 
+        // 接口：当 Common.js 切换语言/货币时，会自动调用这个函数
         window.refreshData = function() {
             if(globalData) renderUI(globalData);
             else fetchData();
@@ -81,11 +82,12 @@
         }
 
         function renderUI(data) {
+            // 核心：使用 common.js 的 formatMoney (已包含实时汇率)
             document.getElementById('price').innerText = formatMoney(data.price);
             document.getElementById('ahr-val').innerText = data.ahr999;
             document.getElementById('mayer-val').innerText = data.mayer;
 
-            // 这里会自动把 "buy_4" 翻译成中文 "抄底区间 (买4份)"
+            // 核心：使用 common.js 的 getStatusText (翻译规则文案)
             document.getElementById('buy-status').innerText = getStatusText(data.buySignal);
             document.getElementById('sell-status').innerText = getStatusText(data.sellSignal);
             document.getElementById('freq-display').innerText = getStatusText(data.frequency);
